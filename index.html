@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build the Plan — Behavior Strategy Game</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:     #f8fafc;
+  --white:  #ffffff;
+  --bg3:    #e2e8f0;
+  --text:   #0f172a;
+  --muted:  #64748b;
+  --brand:  #1d72c3;
+  --brand-d:#155fa0;
+  --yellow: #ffd72d;
+  --red:    #e91e1e;
+  --sc:     #1d72c3;
+  --rad:    12px;
+  --ease:   0.2s ease;
+  --shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+body {
+  font-family: 'Century Gothic', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  user-select: none;
+}
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ── GAME HEADER ── */
+.game-header {
+  background: var(--brand);
+  padding: 0.75rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+  border-bottom: 3px solid var(--yellow);
+  flex-shrink: 0;
+}
+.header-logo { font-size: 0.95rem; font-weight: 800; color: #fff; letter-spacing: 0.1em; }
+.screen-body { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; flex: 1; gap: 0.85rem; overflow: hidden; }
+
+.progress-dots { display: flex; gap: 5px; flex-wrap: wrap; }
+.dot-step { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: background var(--ease); }
+.dot-step.done { background: var(--yellow); }
+.dot-step.now  { background: #fff; }
+
+.mini-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+.mini-chip {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px; padding: 0.22rem 0.65rem;
+  font-size: 0.78rem; display: flex; align-items: center; gap: 0.4rem; color: #fff;
+}
+.mini-chip .cdot { width: 7px; height: 7px; border-radius: 50%; }
+.mini-chip .cpts { font-weight: 800; color: var(--yellow); }
+
+.round-tag {
+  font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.18); border-radius: 20px;
+  padding: 0.22rem 0.75rem; white-space: nowrap;
+}
+
+/* ── SETUP ── */
+.logo-block { text-align: center; }
+.logo-block h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1.5px; color: var(--text); }
+.logo-block h1 em { color: var(--brand); font-style: normal; }
+.logo-block p { color: var(--muted); font-size: 0.9rem; margin-top: 0.4rem; }
+.setup-box {
+  background: var(--white); border: 1px solid var(--bg3);
+  border-radius: var(--rad); padding: 1.75rem 2rem; width: 100%; max-width: 500px;
+  box-shadow: var(--shadow);
+}
+.setup-box h2 {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--muted); margin: 0 0 0.75rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.setup-box h2:not(:first-child) { margin-top: 1.35rem; }
+
+/* Pickers */
+.count-row { display: flex; align-items: center; gap: 0.75rem; }
+.count-lbl { font-size: 0.78rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.cnt-btns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.cnt-btn {
+  width: 2.2rem; height: 2.2rem; border-radius: 8px;
+  border: 1.5px solid var(--bg3); background: var(--bg);
+  color: var(--muted); font-size: 0.9rem; font-weight: 700;
+  cursor: pointer; transition: all var(--ease); font-family: inherit;
+}
+.opt-btn {
+  height: 2.2rem; padding: 0 0.85rem; border-radius: 8px;
+  border: 1.5px solid var(--bg3); background: var(--bg);
+  color: var(--muted); font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: all var(--ease); font-family: inherit;
+}
+.cnt-btn.active, .opt-btn.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.cnt-btn:hover:not(.active), .opt-btn:hover:not(.active) { border-color: var(--brand); color: var(--brand); }
+
+.team-rows { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.75rem; }
+.t-row { display: flex; align-items: center; gap: 0.75rem; }
+.t-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+.t-row input {
+  flex: 1; background: var(--bg); border: 1.5px solid var(--bg3);
+  border-radius: 8px; padding: 0.5rem 0.85rem; color: var(--text);
+  font-size: 0.9rem; outline: none; transition: border-color var(--ease);
+  font-family: inherit;
+}
+.t-row input:focus { border-color: var(--brand); background: var(--white); }
+
+/* Scenario checklist */
+.sel-actions { font-size: 0.68rem; font-weight: 600; text-transform: none; letter-spacing: 0; }
+.sel-actions a { color: var(--brand); cursor: pointer; }
+.sel-actions a:hover { text-decoration: underline; }
+.scen-list {
+  max-height: 200px; overflow-y: auto;
+  border: 1.5px solid var(--bg3); border-radius: 8px;
+  padding: 0.5rem 0.85rem; background: var(--bg);
+}
+.scen-group-hd {
+  font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted);
+  margin: 0.55rem 0 0.3rem; padding-bottom: 0.2rem; border-bottom: 1px solid var(--bg3);
+}
+.scen-group:first-child .scen-group-hd { margin-top: 0; }
+.scen-item { display: flex; align-items: center; gap: 0.55rem; padding: 0.18rem 0; font-size: 0.82rem; cursor: pointer; }
+.scen-item input { width: 15px; height: 15px; accent-color: var(--brand); cursor: pointer; flex-shrink: 0; }
+.scen-cdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.round-hint { font-size: 0.72rem; color: var(--muted); margin-top: 0.5rem; }
+
+.btn-primary {
+  width: 100%; padding: 0.85rem; background: var(--brand); border: none;
+  border-radius: 10px; color: #fff; font-size: 1rem; font-weight: 800;
+  cursor: pointer; letter-spacing: 0.04em; transition: background var(--ease);
+  font-family: inherit; margin-top: 1.5rem;
+}
+.btn-primary:hover { background: var(--brand-d); }
+
+/* ── ROUND ── */
+.stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; }
+.level-pill {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--white); border: 1px solid var(--bg3);
+  border-radius: 20px; padding: 0.35rem 1rem;
+  font-size: 0.85rem; font-weight: 600; color: var(--text);
+  border-left: 4px solid var(--sc); box-shadow: var(--shadow);
+}
+.scenario-card {
+  background: var(--white); border: 2px solid var(--sc);
+  border-radius: 16px; padding: 1.75rem 2.25rem;
+  max-width: 900px; width: 100%;
+  box-shadow: 0 2px 8px rgba(29,114,195,0.1);
+  display: flex; align-items: center; gap: 1.75rem;
+}
+.sc-img { width: 320px; flex-shrink: 0; border-radius: 12px; display: block; }
+.sc-text { flex: 1; min-width: 0; }
+.rev-img { width: 100%; border-radius: 8px; display: block; }
+@media (max-width: 760px) {
+  .scenario-card { flex-direction: column; }
+  .sc-img { width: 100%; max-width: 360px; }
+}
+.sc-name { font-size: 1.35rem; font-weight: 800; color: var(--brand); margin-bottom: 0.7rem; }
+.sc-body { font-size: 1rem; line-height: 1.85; color: var(--text); }
+
+.timer-wrap { text-align: center; }
+.timer-num { font-size: 2.8rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; color: var(--text); transition: color var(--ease); }
+.timer-num.warn   { color: #d97706; }
+.timer-num.danger { color: var(--red); }
+.timer-lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+
+.round-btns { display: flex; gap: 0.75rem; align-items: center; }
+.btn-outline {
+  padding: 0.65rem 1.3rem; border-radius: 10px;
+  background: var(--white); border: 2px solid var(--bg3);
+  color: var(--text); font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; transition: border-color var(--ease); font-family: inherit;
+}
+.btn-outline:hover { border-color: var(--muted); }
+.btn-outline.go { border-color: var(--brand); color: var(--brand); }
+.btn-blue {
+  padding: 0.65rem 1.3rem; border-radius: 10px;
+  background: var(--brand); border: none; color: #fff;
+  font-size: 0.88rem; font-weight: 800; cursor: pointer;
+  transition: background var(--ease); font-family: inherit;
+}
+.btn-blue:hover { background: var(--brand-d); }
+.btn-back {
+  padding: 0.5rem 0.9rem; border-radius: 8px;
+  background: var(--white); border: 1.5px solid var(--bg3);
+  color: var(--muted); font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; transition: border-color var(--ease); font-family: inherit;
+}
+.btn-back:hover { border-color: var(--muted); color: var(--text); }
+.btn-back:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+/* ── REVEAL ── */
+.reveal-body {
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.reveal-scenario {
+  background: #eff6ff; border: 2px solid var(--brand);
+  border-radius: 12px; padding: 1.25rem;
+  overflow-y: auto; display: flex; flex-direction: column; gap: 0.6rem;
+}
+.rev-level-badge {
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--brand);
+  background: rgba(29,114,195,0.1); border-radius: 20px;
+  padding: 0.22rem 0.65rem; display: inline-block; width: fit-content;
+}
+.rev-name { font-size: 1.15rem; font-weight: 800; color: var(--brand); border-bottom: 1px solid #bfdbfe; padding-bottom: 0.5rem; }
+.rev-desc { font-size: 0.84rem; line-height: 1.8; color: #1e3a5f; flex: 1; }
+.rev-hint { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; padding-top: 0.5rem; border-top: 1px solid #bfdbfe; }
+.rev-teach { font-size: 0.78rem; line-height: 1.55; color: #7c2d12; background: #fff7ed; border: 1px solid #fed7aa; border-left: 3px solid #ea580c; border-radius: 8px; padding: 0.55rem 0.7rem; }
+.rev-teach b { display: block; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: #9a3412; margin-bottom: 0.2rem; }
+.txt-toggle { align-self: flex-start; background: var(--white); border: 1.5px solid var(--bg3); color: var(--brand); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.72rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.txt-toggle:hover { border-color: var(--brand); }
+.a-card.pending { opacity: 0.4; cursor: not-allowed; }
+.a-card.pending:hover { filter: none; }
+body.big-text .a-explain { font-size: 0.94rem; line-height: 1.7; }
+body.big-text .a-label { font-size: 1.18rem; }
+body.big-text .rev-desc { font-size: 0.96rem; }
+/* Answer-key print sheet (hidden on screen, shown only when printing the key) */
+#answerKey { display: none; padding: 1.5rem; color: #000; }
+.ak-hd { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.2rem; }
+.ak-sub { font-size: 0.8rem; color: #555; margin-bottom: 1rem; }
+.ak-item { border: 1px solid #ccc; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.8rem; page-break-inside: avoid; }
+.ak-item h3 { font-size: 1rem; margin-bottom: 0.15rem; }
+.ak-meta { font-size: 0.72rem; color: #666; margin-bottom: 0.4rem; }
+.ak-desc { font-size: 0.8rem; line-height: 1.5; margin-bottom: 0.5rem; }
+.ak-ans { font-size: 0.8rem; line-height: 1.45; margin: 0.2rem 0; }
+.ak-teach { font-size: 0.76rem; font-style: italic; color: #7c2d12; margin-top: 0.45rem; }
+
+.reveal-right { display: flex; flex-direction: column; gap: 0.6rem; min-height: 0; }
+.answers-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr; gap: 0.6rem; flex: 1; min-height: 0;
+}
+.a-card {
+  border-radius: 12px; border: 3px solid transparent;
+  padding: 1.1rem; display: flex; flex-direction: column;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: filter var(--ease);
+}
+.a-card:hover { filter: brightness(1.08); }
+.a-card.revealed { cursor: default; filter: none; }
+.a-card.fn { background: #dc2626; border-color: #b91c1c; }
+.a-card.pr { background: #16a34a; border-color: #14532d; }
+.a-card.rs { background: #d97706; border-color: #b45309; }
+.a-card.rb { background: #7c3aed; border-color: #5b21b6; }
+
+.a-card .a-lock { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 0.5rem; text-align: center; }
+.a-lock-cat { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; }
+.a-lock-text { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.75); }
+.a-card.revealed .a-lock { display: none; }
+
+.a-content { display: none; flex-direction: column; gap: 0.45rem; height: 100%; }
+.a-card.revealed .a-content { display: flex; }
+.a-type { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.75); }
+.a-label { font-size: 1rem; font-weight: 800; color: #fff; line-height: 1.2; }
+.a-explain { font-size: 0.76rem; line-height: 1.65; color: rgba(255,255,255,0.92); flex: 1; overflow-y: auto; }
+
+/* ── SCORING ── */
+.score-panel {
+  background: var(--white); border: 1px solid var(--bg3);
+  border-radius: 12px; padding: 0.85rem 1rem; box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+.score-ttl { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.65rem; }
+#scoreGrid { overflow-x: auto; }
+.sg-table { border-collapse: collapse; width: 100%; min-width: 360px; }
+.sg-table th { font-size: 0.72rem; font-weight: 700; padding: 0 0.4rem 0.5rem; text-align: center; white-space: nowrap; max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
+.sg-table td { padding: 0.2rem 0.3rem; }
+.sg-row-label { font-size: 0.72rem; color: var(--muted); white-space: nowrap; padding-right: 0.5rem; }
+.sg-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.sg-btn {
+  width: 100%; height: 30px; border-radius: 6px;
+  background: var(--bg); border: 1.5px solid var(--bg3);
+  color: var(--muted); font-size: 0.72rem; font-weight: 700;
+  cursor: pointer; transition: all var(--ease); font-family: inherit;
+}
+.sg-btn.on { background: #dcfce7; border-color: #16a34a; color: #14532d; }
+.sg-btn.bonus-btn { background: #fffbe6; border-color: #fbbf24; color: #78350f; }
+.sg-total { text-align: center; font-size: 1rem; font-weight: 800; color: var(--brand); padding: 0.3rem 0.3rem 0; }
+
+.score-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 0.65rem; gap: 0.5rem; }
+.score-actions-left { display: flex; gap: 0.5rem; }
+.btn-wild {
+  padding: 0.5rem 1rem; border-radius: 8px;
+  background: transparent; border: 2px solid var(--brand);
+  color: var(--brand); font-size: 0.82rem; font-weight: 800;
+  cursor: pointer; transition: background var(--ease); font-family: inherit;
+}
+.btn-wild:hover { background: #eff6ff; }
+.btn-next {
+  padding: 0.55rem 1.4rem; border-radius: 8px;
+  background: var(--brand); border: none; color: #fff;
+  font-size: 0.88rem; font-weight: 800; cursor: pointer;
+  transition: background var(--ease); font-family: inherit;
+}
+.btn-next:hover { background: var(--brand-d); }
+
+/* ── FINAL ── */
+#final .screen-body { align-items: center; justify-content: center; gap: 1.75rem; }
+.final-hd { text-align: center; }
+.final-hd h1 { font-size: 2.6rem; font-weight: 800; color: var(--text); }
+.final-hd h1 em { color: var(--brand); font-style: normal; }
+.final-hd p { color: var(--muted); font-size: 0.9rem; margin-top: 0.4rem; }
+.leaderboard { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; max-width: 440px; }
+.lb-row { display: flex; align-items: center; gap: 0.9rem; background: var(--white); border: 1.5px solid var(--bg3); border-radius: 10px; padding: 0.85rem 1.1rem; box-shadow: var(--shadow); }
+.lb-row.top { background: #eff6ff; border-color: var(--brand); border-width: 2px; }
+.lb-place { font-size: 0.95rem; font-weight: 800; width: 2.4rem; text-align: center; color: var(--muted); }
+.lb-row.top .lb-place { color: var(--brand); }
+.lb-cdot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.lb-name { flex: 1; font-weight: 700; }
+.lb-score { font-size: 1.2rem; font-weight: 800; color: var(--brand); }
+.final-btns { display: flex; gap: 0.75rem; }
+.btn-sm { padding: 0.65rem 1.3rem; border-radius: 10px; background: var(--white); border: 1.5px solid var(--bg3); color: var(--text); font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: border-color var(--ease); font-family: inherit; }
+.btn-sm:hover { border-color: var(--muted); }
+.btn-print { padding: 0.65rem 1.4rem; border-radius: 10px; background: var(--brand); border: none; color: #fff; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background var(--ease); font-family: inherit; }
+.btn-print:hover { background: var(--brand-d); }
+
+/* ── WILD CARD MODAL ── */
+.overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: none; align-items: center; justify-content: center; z-index: 200; }
+.overlay.open { display: flex; }
+.modal { background: var(--white); border: 2px solid var(--brand); border-radius: 16px; padding: 2rem; width: 100%; max-width: 400px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+.modal h2 { font-size: 1.1rem; font-weight: 800; color: var(--brand); margin-bottom: 0.4rem; }
+.modal p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.1rem; }
+.modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.m-lbl { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.35rem; }
+.modal select { width: 100%; background: var(--bg); border: 1.5px solid var(--bg3); border-radius: 8px; padding: 0.55rem 0.75rem; color: var(--text); font-size: 0.88rem; outline: none; font-family: inherit; }
+.modal-btns { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.m-btn { flex: 1; min-width: 100px; padding: 0.6rem 0.75rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: 1.5px solid; font-family: inherit; }
+.m-win  { background: #f0fdf4; border-color: #16a34a; color: #14532d; }
+.m-lose { background: #fff5f5; border-color: var(--red); color: #7f1d1d; }
+.m-cancel { background: var(--bg); border-color: var(--bg3); color: var(--muted); }
+
+/* ── PRINT ── */
+@media print {
+  .screen { display: none !important; }
+  #answerKey { display: none; }
+  /* Scores mode (default) */
+  body:not(.print-key) .game-header { background: var(--brand) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body:not(.print-key) #final { display: flex !important; }
+  body:not(.print-key) #final .game-header { display: flex !important; }
+  .final-btns, .btn-sm, .btn-print { display: none !important; }
+  .lb-row { border: 1px solid #ccc; box-shadow: none; }
+  .lb-score { color: var(--brand); }
+  /* Answer-key mode */
+  body.print-key #answerKey { display: block !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SETUP ══════════════ -->
+<div id="setup" class="screen active">
+  <div class="game-header">
+    <span class="header-logo">Build the Plan</span>
+  </div>
+  <div class="screen-body" style="align-items:center;justify-content:flex-start;gap:1.5rem;overflow-y:auto;padding:2rem 1.5rem;">
+    <div class="logo-block">
+      <h1>Build the <em>Plan</em></h1>
+      <p>A Behavior Strategy Card Game</p>
+    </div>
+    <div class="setup-box">
+      <h2>Teams</h2>
+      <div class="count-row">
+        <span class="count-lbl">How many?</span>
+        <div class="cnt-btns" id="cntBtns">
+          <button class="cnt-btn" onclick="setTeamCount(2)">2</button>
+          <button class="cnt-btn" onclick="setTeamCount(3)">3</button>
+          <button class="cnt-btn" onclick="setTeamCount(4)">4</button>
+          <button class="cnt-btn active" onclick="setTeamCount(5)">5</button>
+          <button class="cnt-btn" onclick="setTeamCount(6)">6</button>
+        </div>
+      </div>
+      <div class="team-rows" id="teamRows"></div>
+
+      <h2>Discussion Timer</h2>
+      <div class="count-row">
+        <div class="cnt-btns" id="timerBtns">
+          <button class="opt-btn" onclick="setTimer(60)">1:00</button>
+          <button class="opt-btn active" onclick="setTimer(90)">1:30</button>
+          <button class="opt-btn" onclick="setTimer(120)">2:00</button>
+        </div>
+      </div>
+
+      <h2>Scenarios <span class="sel-actions"><a onclick="selectAllScen(true)">Select all</a> · <a onclick="selectAllScen(false)">None</a></span></h2>
+      <div class="scen-list" id="scenList"></div>
+
+      <h2>Rounds to Play</h2>
+      <div class="count-row">
+        <div class="cnt-btns" id="roundBtns">
+          <button class="opt-btn active" onclick="setRoundLimit(0)">All</button>
+          <button class="opt-btn" onclick="setRoundLimit(4)">4</button>
+          <button class="opt-btn" onclick="setRoundLimit(6)">6</button>
+          <button class="opt-btn" onclick="setRoundLimit(8)">8</button>
+          <button class="opt-btn" onclick="setRoundLimit(10)">10</button>
+        </div>
+      </div>
+      <div class="round-hint" id="roundHint"></div>
+
+      <button class="btn-primary" onclick="startGame()">Start Game &nbsp;→</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ ROUND ══════════════ -->
+<div id="round" class="screen">
+  <div class="game-header">
+    <span class="header-logo">Build the Plan</span>
+    <div class="progress-dots" id="progDots"></div>
+    <div class="mini-bar" id="miniBar1"></div>
+  </div>
+  <div class="screen-body">
+    <div class="stage">
+      <div class="level-pill" id="levelPill">
+        <span id="pillLevel"></span>
+        &nbsp;·&nbsp;
+        <span id="pillGrade"></span>
+      </div>
+      <div class="scenario-card">
+        <img class="sc-img" id="scImg" alt="" />
+        <div class="sc-text">
+          <div class="sc-name" id="scName"></div>
+          <div class="sc-body" id="scBody"></div>
+        </div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-num" id="timerNum">1:30</div>
+        <div class="timer-lbl">discussion time</div>
+      </div>
+      <div class="round-btns">
+        <button class="btn-back" id="roundBackBtn" onclick="prevRound()" disabled>←&nbsp;Back</button>
+        <button class="btn-outline go" id="timerBtn" onclick="toggleTimer()">Start Timer</button>
+        <button class="btn-blue" onclick="goReveal()">Show Answers &nbsp;→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ REVEAL ══════════════ -->
+<div id="reveal" class="screen">
+  <div class="game-header">
+    <span class="header-logo">Build the Plan</span>
+    <span class="round-tag" id="revTag"></span>
+    <div class="mini-bar" id="miniBar2"></div>
+  </div>
+  <div class="screen-body" style="gap:0.75rem;">
+    <div class="reveal-body">
+      <!-- Left: Full Scenario -->
+      <div class="reveal-scenario">
+        <div class="rev-level-badge" id="revBadge"></div>
+        <img class="rev-img" id="revImg" alt="" />
+        <div class="rev-name" id="revName"></div>
+        <div class="rev-desc" id="revDesc"></div>
+        <div class="rev-hint">reveal Function first, then the strategies</div>
+        <button class="txt-toggle" id="txtToggle" onclick="toggleTextSize()">A+ Larger text</button>
+      </div>
+      <!-- Right: Answers + Scoring -->
+      <div class="reveal-right">
+        <div class="answers-grid">
+          <div class="a-card fn" id="cardFn" onclick="reveal('fn')">
+            <div class="a-lock"><div class="a-lock-cat">Function</div><div class="a-lock-text">Click to Reveal</div></div>
+            <div class="a-content">
+              <div class="a-type">Function of Behavior</div>
+              <div class="a-label" id="lFn"></div>
+              <div class="a-explain" id="eFn"></div>
+            </div>
+          </div>
+          <div class="a-card pr" id="cardPr" onclick="reveal('pr')">
+            <div class="a-lock"><div class="a-lock-cat">Proactive</div><div class="a-lock-text">Click to Reveal</div></div>
+            <div class="a-content">
+              <div class="a-type">Proactive Strategy</div>
+              <div class="a-label" id="lPr"></div>
+              <div class="a-explain" id="ePr"></div>
+            </div>
+          </div>
+          <div class="a-card rs" id="cardRs" onclick="reveal('rs')">
+            <div class="a-lock"><div class="a-lock-cat">Response</div><div class="a-lock-text">Click to Reveal</div></div>
+            <div class="a-content">
+              <div class="a-type">Response Strategy</div>
+              <div class="a-label" id="lRs"></div>
+              <div class="a-explain" id="eRs"></div>
+            </div>
+          </div>
+          <div class="a-card rb" id="cardRb" onclick="reveal('rb')">
+            <div class="a-lock"><div class="a-lock-cat">Replacement</div><div class="a-lock-text">Click to Reveal</div></div>
+            <div class="a-content">
+              <div class="a-type">Replacement Behavior</div>
+              <div class="a-label" id="lRb"></div>
+              <div class="a-explain" id="eRb"></div>
+            </div>
+          </div>
+        </div>
+        <div class="score-panel">
+          <div class="score-ttl">Score this round — toggle each correct answer per team</div>
+          <div id="scoreGrid"></div>
+          <div class="score-actions">
+            <div class="score-actions-left">
+              <button class="btn-back" id="revBackBtn" onclick="prevRound()" disabled>←&nbsp;Prev Round</button>
+              <button class="btn-wild" onclick="openWild()">Wild Card</button>
+            </div>
+            <button class="btn-next" id="nextBtn" onclick="nextRound()">Next Round →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ FINAL ══════════════ -->
+<div id="final" class="screen">
+  <div class="game-header">
+    <span class="header-logo">Build the Plan</span>
+  </div>
+  <div class="screen-body" style="align-items:center;justify-content:center;gap:1.75rem;">
+    <div class="final-hd">
+      <h1>Game <em>Over</em></h1>
+      <p>Build the Plan &nbsp;·&nbsp; Behavior Strategy Card Game</p>
+    </div>
+    <div class="leaderboard" id="leaderboard"></div>
+    <div class="final-btns">
+      <button class="btn-sm" onclick="resetGame()">Play Again</button>
+      <button class="btn-print" onclick="window.print()">Print Scores</button>
+      <button class="btn-print" onclick="printAnswerKey()">Print Answer Key</button>
+    </div>
+  </div>
+</div>
+
+<!-- Wild Card Modal -->
+<div class="overlay" id="wildOverlay">
+  <div class="modal">
+    <h2>Wild Card Challenge</h2>
+    <p>The challenging team forces another team to explain their answer out loud. If the challenged team defends it — challenger loses 1 pt. If they can't — challenger steals 2 pts.</p>
+    <div class="modal-row">
+      <div><div class="m-lbl">Challenging team</div><select id="wChallenger"></select></div>
+      <div><div class="m-lbl">Challenged team</div><select id="wChallenged"></select></div>
+    </div>
+    <div class="modal-btns">
+      <button class="m-btn m-win"    onclick="resolveWild(true)">Challenger wins (+2)</button>
+      <button class="m-btn m-lose"   onclick="resolveWild(false)">Challenged defends (−1)</button>
+      <button class="m-btn m-cancel" onclick="closeWild()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="answerKey"></div>
+
+<script>
+/* ══════════════ DATA ══════════════ */
+const COLORS = ['#1d72c3','#16a34a','#d97706','#e91e1e','#7c3aed','#0891b2'];
+const MEDALS = ['1st','2nd','3rd','4th','5th','6th'];
+const LVL_COLORS = {
+  'Early Childhood':    '#db2777',
+  'Primary Grades':     '#d97706',
+  'Elementary':         '#16a34a',
+  'Intermediate Grades':'#0891b2',
+  'Middle School':      '#1d72c3',
+  'High School':        '#7c3aed'
+};
+const CAT_META = {
+  fn: { name:'Function',    c:'#dc2626' },
+  pr: { name:'Proactive',   c:'#16a34a' },
+  rs: { name:'Response',    c:'#d97706' },
+  rb: { name:'Replacement', c:'#7c3aed' }
+};
+
+const SCENARIOS = [
+  {
+    "level": "Early Childhood",
+    "grade": "Kindergarten",
+    "name": "AB",
+    "desc": "AB is a kindergarten student with developmental delays impacting his language and social skills. He enjoys action figures and iPad videos. During recess, AB becomes upset when classmates try to play with the class set of action figures — pushing and hitting other students when they approach.",
+    "fn": {
+      "l": "Tangible (Action Figures)",
+      "e": "Aggression occurs specifically when others attempt to access AB's preferred items. The behavior functions to protect tangible access. Language delays reduce his ability to communicate competing wants verbally, making physical behavior the fastest available response."
+    },
+    "pr": {
+      "l": "Designated Personal Set + First/Then",
+      "e": "Provide AB with his own designated set of action figures to eliminate competition over shared toys. Use a visual First/Then board so he knows what comes after recess. Pre-teach turn-taking expectations with a visual schedule before conflict starts."
+    },
+    "rs": {
+      "l": "Block + Calm Redirect",
+      "e": "Physically block aggression safely without escalating. Calmly redirect AB to a separate play space with his designated items. Keep language simple — lengthy verbal reprimands increase arousal. Use the preferred item itself as an immediate redirect tool."
+    },
+    "rb": {
+      "l": "AAC / Picture Request Card",
+      "e": "Teach AB to use a picture card, AAC device, or gesture meaning \"my turn\" or \"no\" when peers approach. This gives him a functional communication alternative that earns the same outcome as hitting — without the aggression."
+    }
+  },
+  {
+    "level": "Early Childhood",
+    "grade": "Pre-K",
+    "name": "CD",
+    "desc": "CD is a very active Pre-K student in a blended classroom. He frequently asks to go outside and asks when it's time to go home. CD attempts to climb furniture and leave the classroom. Elopement tends to happen early in the day; climbing increases later — suggesting different triggers across the day.",
+    "fn": {
+      "l": "Escape + Sensory (Movement)",
+      "e": "The two behaviors happen at different times of day, which points to two different reasons. Early on, leaving the room lets CD escape a setting that feels non-preferred or overwhelming. Later, climbing gives him the movement and sensory input he needs as his energy builds. His requests to go outside or go home show he is trying to tell staff what he wants."
+    },
+    "pr": {
+      "l": "Visual Schedule + Proactive Movement Breaks",
+      "e": "Post a visual daily schedule that clearly marks outdoor time so CD can see it is coming. Build in movement breaks before the times he usually leaves the room or climbs. Give him activities that let him get his energy out in a functional way, such as movement tasks, active classroom jobs, or a set indoor movement spot, so the need is met before it turns into climbing or leaving."
+    },
+    "rs": {
+      "l": "Safe Redirect to Alternative Movement",
+      "e": "When climbing happens, stay calm and redirect CD to a safe way to move, such as a sensory spot, an indoor jump space, or a supervised hallway walk. Only use restraint if safety requires it. If he leaves the room, follow and catch up with him calmly instead of chasing."
+    },
+    "rb": {
+      "l": "\"I Need a Break\" Communication",
+      "e": "Teach CD to hand over a break card or use a gesture to ask for a movement break instead of leaving on his own. Honor the request every time. If he asks and nothing happens, the card will not replace leaving."
+    }
+  },
+  {
+    "level": "Early Childhood",
+    "grade": "Kindergarten",
+    "name": "EF",
+    "desc": "EF is a kindergarten student who frequently has tantrums when redirected to sit at the table and complete assigned activities. Tantrums include crying, loud vocalizations, dropping to the floor, and kicking — and can escalate to self-injurious behaviors such as head-banging on furniture or the floor.",
+    "fn": {
+      "l": "Escape / Avoidance",
+      "e": "Tantrums occur in direct response to a demand. The behavior results in removal from or delay of the demand. Escalation to SIB may have been accidentally reinforced when staff withdrew demands to prevent injury — teaching EF that more intense behavior earns faster escape."
+    },
+    "pr": {
+      "l": "Reduce Demand + First/Then Visual",
+      "e": "Shorten the task duration significantly, offer choices within the activity, and use a First/Then board. Pre-teach transitions with a visual timer so EF knows the demand is temporary and predictable. Gradual approximations are more effective than holding the full demand."
+    },
+    "rs": {
+      "l": "Neutral Presence + Safety Protocol",
+      "e": "Stay calm and nearby without escalating demands during the tantrum. Do not withdraw the demand entirely (this reinforces behavior) but do not push harder either. If SIB is a safety risk, implement your safety protocol — block without restraint where possible and wait for a window of calm."
+    },
+    "rb": {
+      "l": "\"I Need Help\" / \"I Need a Break\" Card",
+      "e": "Teach EF to hand over a break card or use a simple gesture before escalating. Must be taught during calm moments, reinforced immediately every time it is used, and consistently paired with actually receiving a brief break."
+    }
+  },
+  {
+    "level": "Primary Grades",
+    "grade": "2nd Grade",
+    "name": "GH",
+    "desc": "GH is a nonverbal second grader in a separate classroom. He enjoys building with blocks, magnet tiles, and watching videos on the iPad or Smartboard. When given paper and pencil tasks, GH attempts to leave the area. Aggression toward staff has occurred and has resulted in bruises and abrasions.",
+    "fn": {
+      "l": "Escape (Aversive Demand)",
+      "e": "Paper and pencil tasks are highly aversive — likely due to motor difficulty, inability to communicate distress verbally, or a history of failure. Both elopement and aggression result in removal from the demand, which reinforces the behavior. The pattern is predictable by task type."
+    },
+    "pr": {
+      "l": "Alternative Tools + Pair Demand with Preferred",
+      "e": "Present tasks using preferred formats — tablet, keyboard, or magnetic writing board instead of paper and pencil. Intersperse short preferred activities between demand intervals. Use a First/Then structure and reduce response effort before introducing new expectations."
+    },
+    "rs": {
+      "l": "Safety Protocol + Reduce Demand In-the-Moment",
+      "e": "When agitation begins, reduce or pause the demand before behavior escalates. Stay calm, use simple language or visuals. If aggression occurs, follow your school's safety protocol: protect yourself and others while maintaining a regulated, non-reactive presence."
+    },
+    "rb": {
+      "l": "AAC \"Help\" / \"Break\" Request",
+      "e": "Teach GH to use an AAC device, picture card, or gesture to request a break or assistance. Must be reinforced consistently and immediately. Over time, pair appropriate requesting with preferred activities so functional communication becomes more effective than aggression."
+    }
+  },
+  {
+    "level": "Primary Grades",
+    "grade": "1st Grade",
+    "name": "IJ",
+    "desc": "IJ is a first grader in a regular education classroom who requires frequent redirection and struggles to stay seated in large groups for more than 3 minutes. IJ frequently leaves the group and walks to the cubby area where students keep their lunch bags — and has removed and eaten classmates' food.",
+    "fn": {
+      "l": "Tangible (Food Access)",
+      "e": "IJ's wandering has a clear destination and consistent outcome: eating food from lunch bags. The behavior is maintained by tangible access to food. Escape from the group may play a secondary role, but the consistent location and outcome point to food as the primary function."
+    },
+    "pr": {
+      "l": "Environmental Modification + Structured Seating",
+      "e": "Relocate or remove visibility of lunch bags during group instruction time. Seat IJ near the teacher and away from the cubby area. Provide visual cues for expected behavior and a visual timer to define how long the activity lasts."
+    },
+    "rs": {
+      "l": "Calm Redirect Without Power Struggle",
+      "e": "When IJ gets up, calmly redirect back to the group using a simple verbal prompt or visual cue — not a lecture or public correction. If food was already accessed, address calmly after the situation settles. Avoid confrontation that escalates behavior."
+    },
+    "rb": {
+      "l": "Scheduled Snack + Request Communication",
+      "e": "Ensure a predictable scheduled snack time. Teach IJ to ask for a snack using words, a card, or a gesture at the appropriate time. When a legitimate snack time is available and honored consistently, the motivation to wander to the cubbies decreases."
+    }
+  },
+  {
+    "level": "Primary Grades",
+    "grade": "2nd Grade",
+    "name": "KL",
+    "desc": "KL is a second grader whose favorite subject is math — he will engage with math facts and games for extended periods. When given non-preferred tasks, KL engages in verbal protests that may include profanity. When ignored, behaviors escalate to flipping furniture and throwing objects at others.",
+    "fn": {
+      "l": "Escape (Non-Preferred Task)",
+      "e": "Verbal protests and property destruction occur in response to non-preferred task demands. Escalation suggests lower-level protests have been reinforced by demand removal in the past. The function is escape from work KL finds aversive."
+    },
+    "pr": {
+      "l": "First/Then + Embed Preferred Within Work",
+      "e": "Make the contingency explicit before the task: \"First this, then math.\" Reduce the non-preferred task length significantly and offer choices within it. Pre-plan the sequence so KL can see the end before protests start."
+    },
+    "rs": {
+      "l": "WAIT + Safety Protocol for Escalation",
+      "e": "When protests begin, stop talking — WAIT (Why Am I Talking?). The lecture often becomes the reinforcer. If behavior escalates to property destruction, implement safety protocols: remove other students, stay calm, do not escalate demands. Wait for a window of calm."
+    },
+    "rb": {
+      "l": "Raise Hand / Break Card",
+      "e": "Teach KL to raise his hand or hand in a break card before escalating. Must be honored predictably and immediately — if he asks and demands continue without acknowledgment, the card loses all function."
+    }
+  },
+  {
+    "level": "Primary Grades",
+    "grade": "2nd Grade",
+    "name": "YZ",
+    "desc": "During independent work, YZ makes loud animal noises, tips his chair back until it nearly falls, and does exaggerated pratfalls out of his seat. The class laughs every single time. The teacher has tried warnings, clip-downs, and lecturing him in the hallway — nothing changes. But when YZ works one-on-one with the teacher at the back table, with no peers watching, the behavior does not occur at all. He completes the same worksheet without complaint.",
+    "fn": {
+      "l": "Attention (Peer — Not Adult)",
+      "e": "The discriminating clue is the back table: same task, same teacher, no peers, no behavior. That rules out escape — he does the work when peers are not watching. It also rules out adult attention — the teacher gives him plenty and it changes nothing. The class laughing is the reinforcer. Identify WHOSE attention maintains the behavior before you pick a plan."
+    },
+    "pr": {
+      "l": "Give Him a Legitimate Audience",
+      "e": "Build in scheduled, appropriate peer attention before the behavior is needed: classroom jobs, line leader, peer tutor, \"share your work\" moments. Consider seating that reduces line-of-sight to his biggest reactors. A token system that earns a class-facing privilege gives him a path to the same reinforcer."
+    },
+    "rs": {
+      "l": "Coach the Peers, Not Just YZ",
+      "e": "Planned ignoring only works if the people delivering the reinforcer stop delivering it — and here that is the class, not the teacher. Teach and reinforce the class for not reacting. Adult redirection should be brief, quiet, and private (a lecture in the hallway is a stage). Immediately reinforce on-task work when it occurs."
+    },
+    "rb": {
+      "l": "Appropriate Peer-Attention Behavior",
+      "e": "Teach YZ a way to earn peer attention that works: raise his hand to share an answer, present his work, tell a joke at a designated time. The replacement must actually deliver peer attention reliably — if it does not, the animal noises will keep winning because they always work."
+    }
+  },
+  {
+    "level": "Intermediate Grades",
+    "grade": "4th Grade",
+    "name": "MN",
+    "desc": "MN is a fourth grade student in a separate classroom setting. MN frequently refuses to enter the classroom during morning arrival — as MN gets close to the door, MN drops to the floor and refuses to move. MN always carries a favorite stuffed animal in the bookbag. A preferred class activity is center time, where MN goes to the listening station to listen to books while reading along.",
+    "fn": {
+      "l": "Escape / Avoidance (Entering the Classroom)",
+      "e": "The behavior happens at one specific moment — the doorway at arrival — and it works: MN stays out of the room. Something about entering is aversive, whether it is the noise, the transition, or the unpredictability of what comes first. Dropping to the floor delays or prevents entry, and that delay is the reinforcer."
+    },
+    "pr": {
+      "l": "First/Then Using Center Time + Bring the Stuffed Animal In",
+      "e": "Use what MN already loves. Make the contingency visible at the door: \"First we walk in, then listening station.\" Let the stuffed animal come in as a transition object — a comfort item that travels with MN into the room lowers the aversiveness of entering. Consider a job at arrival (deliver attendance, turn on the listening station) so entering has an immediate purpose and payoff."
+    },
+    "rs": {
+      "l": "Do Not Escalate at the Door — Reduce, Do Not Push",
+      "e": "Physically pulling or looming over a student on the floor turns refusal into a crisis. Get low, keep language minimal, and reduce the demand instead of repeating it: \"You can walk in, or I can walk in with you.\" Give processing time. Reinforce the smallest approximation — a step, standing up, moving toward the door — rather than holding out for full compliance."
+    },
+    "rb": {
+      "l": "Teach a Transition Request",
+      "e": "Teach MN to ask for what is actually being requested through refusal — more time, the stuffed animal, or a preferred first activity. A card or verbal phrase (\"I need a minute\" / \"Can I start at the listening station?\") that is honored reliably gives MN a way to influence the transition without dropping to the floor."
+    }
+  },
+  {
+    "level": "Intermediate Grades",
+    "grade": "5th Grade",
+    "name": "OP",
+    "desc": "OP is a fifth grade student in a regular education classroom. OP's favorite subject is science and frequently asks to read books about animals and dinosaurs. When given a non-preferred task, OP frequently attempts to elope from the classroom. Blocking the attempts to leave the room has resulted in aggression.",
+    "fn": {
+      "l": "Escape (Non-Preferred Task)",
+      "e": "Elopement is triggered by the non-preferred task and results in leaving the demand behind. The aggression is not a separate problem — it appears only when the escape route is blocked. That is an important read: blocking without teaching an alternative escalates the topography but does not change the function."
+    },
+    "pr": {
+      "l": "First/Then With Science + Reduce Response Effort",
+      "e": "Use science as the \"then.\" Make the contingency explicit and short before the non-preferred task begins, and shrink the task so the finish line is visible. Embed OP's interests into the non-preferred work where possible — a writing prompt about dinosaurs is still writing. Offer choice within the task to increase buy-in before elopement is on the table."
+    },
+    "rs": {
+      "l": "Safe Supervision, Not a Blockade + Safety Protocol",
+      "e": "Blocking the door reliably produces aggression, so plan around it: define a safe, supervised area OP can go to, keep a calm distance, and follow the student rather than confronting. Do not chase or corner. If aggression occurs, follow your school safety protocol and stay non-reactive. Once calm, return to a reduced version of the demand so escape is not fully reinforced."
+    },
+    "rb": {
+      "l": "Break Card (FCT) — An Escape Route That Is Allowed",
+      "e": "OP needs a legitimate way to leave. Teach a break card or a \"walk pass\" that produces the same outcome as eloping — brief removal from the demand — but safely and with permission. It must be honored immediately and every time. If asking is slower or less reliable than running, running will keep winning."
+    }
+  },
+  {
+    "level": "Intermediate Grades",
+    "grade": "5th Grade",
+    "name": "QR",
+    "desc": "QR is a nonverbal fifth grade student in a separate classroom setting. QR's favorite activities are watching videos on the iPad and playing video games. When unexpected interruptions to the day occur — a fire drill, an emergency drill, a crisis with another student — QR becomes upset, which has escalated to self-injurious behavior including head banging.",
+    "fn": {
+      "l": "Escape / Avoidance of Unpredictable Change",
+      "e": "The trigger is not a task demand — it is the loss of predictability. Unexpected change is the aversive event, and the SIB functions to escape or terminate it. Being nonverbal removes the fastest way to protest, ask what is happening, or ask for it to stop, so behavior does the communicating. Note the risk: staff rushing in to soothe may also be adding an attention component."
+    },
+    "pr": {
+      "l": "Build Predictability + Pre-Teach the Unexpected",
+      "e": "You cannot prevent fire drills, so prepare for them. Use a visual schedule with a \"surprise\" or \"change\" card that gets inserted when the day shifts. Pre-teach and rehearse drills when calm, not in the moment. Pre-plan a go-to comfort routine (iPad, noise-reducing headphones) that is delivered proactively the second a change begins — before escalation, not after."
+    },
+    "rs": {
+      "l": "Safety First — Block Without Restraint, Minimize Language",
+      "e": "SIB is a safety event. Follow your protocol: protect the head, use padding or blocking, remove hazards, clear the area. Keep language to a minimum — verbal reassurance during escalation adds stimulation to an already overwhelmed student. Wait for a window of calm. Critically, avoid a pattern where SIB reliably produces the iPad; deliver the calming item early in the sequence, not as the payoff at peak intensity."
+    },
+    "rb": {
+      "l": "AAC / Picture Card for \"Stop\" or \"Break\"",
+      "e": "Give QR a way to say what the head banging is saying. A picture card, AAC symbol, or gesture meaning \"too much,\" \"stop,\" or \"break\" — taught during calm periods and reinforced immediately every single time it is used. It must work faster than the SIB does, or it will never compete with it."
+    }
+  },
+  {
+    "level": "High School",
+    "grade": "9th Grade",
+    "name": "ST",
+    "desc": "ST is a ninth grade student in a separate classroom setting. Preferred activities include watching videos on YouTube and listening to music. ST has limited communication skills and frequently refuses to engage with classroom activities. When prompted to participate, ST attempts to leave the area. Aggression toward staff has occurred when staff attempt to redirect ST back to the appropriate activity.",
+    "fn": {
+      "l": "Escape (Demand + Redirection)",
+      "e": "Two escape events are stacked. The prompt to participate triggers leaving the area, and the redirection back triggers aggression. Both behaviors terminate a demand. Limited communication means ST has no efficient way to say \"no,\" \"not yet,\" or \"I need help\" — so leaving and hitting do that job, and they do it fast."
+    },
+    "pr": {
+      "l": "Pair Preferred Media With the Demand + First/Then",
+      "e": "Use YouTube and music as the \"then,\" and make it visual — ST's communication limits mean a verbal contingency may not land. Shorten the work interval dramatically and build in music or video breaks on a schedule (NCR) so ST does not have to escape to get them. Reduce response effort before adding expectations."
+    },
+    "rs": {
+      "l": "Do Not Chase the Redirection — Follow the Safety Protocol",
+      "e": "Redirecting ST back is the specific trigger for aggression, so stop making that the automatic first move. Allow safe distance in a supervised area, drop the demand temporarily, and stay calm and non-reactive. If aggression occurs, follow your school safety protocol. Re-approach later with a reduced demand rather than escalating in the moment."
+    },
+    "rb": {
+      "l": "AAC / Break Card — \"I Need a Break\" or \"All Done\"",
+      "e": "ST needs an efficient, low-effort way to end a demand. Teach a break card, AAC symbol, or gesture and honor it immediately, every time — even when it is inconvenient. Then shape tolerance gradually (one problem, then break; two problems, then break). If asking is slower than walking away, ST will keep walking away."
+    }
+  },
+  {
+    "level": "High School",
+    "grade": "10th Grade",
+    "name": "UV",
+    "desc": "UV is a tenth grade student in the regular education setting. UV's preferred classes are music and digital design. When UV attends a non-preferred class, UV frequently refuses to participate in the assigned activity and engages in behavior that is disruptive to the rest of the class — calling out, talking to peers, or using the computer in a way that distracts other students.",
+    "fn": {
+      "l": "Escape (Non-Preferred Class) + Peer Attention",
+      "e": "Two things are running at once. The refusal is escape — it only happens in non-preferred classes, never in music or digital design. But the calling out and peer-directed disruption also earn an audience, which is why the behavior is loud rather than silent. A student purely escaping work can just put their head down. Disruption gets both."
+    },
+    "pr": {
+      "l": "First/Then + Embed Preferred Skills Into Non-Preferred Work",
+      "e": "Make the contingency explicit and adult: \"Finish this block, then you have the last ten minutes for digital design.\" Bring the preferred content into the non-preferred class where you can — let UV present a project digitally, build a slide deck, use design software for the assignment. Reduce the task so completion is realistic, and offer choice within it."
+    },
+    "rs": {
+      "l": "Private Precision Request + WAIT + Remove the Audience",
+      "e": "A public correction hands UV the peer attention half of the reinforcer. Deliver one clear, calm, private request — then stop talking (WAIT). Do not debate. Redirect the peers who are reacting, since they are delivering the reinforcer. Reinforce the moment UV re-engages, even partially, rather than waiting for a perfect finished product."
+    },
+    "rb": {
+      "l": "Break Card + Self-Monitoring Checklist",
+      "e": "UV needs both routes covered: a legitimate way to get a break from the non-preferred class, and a legitimate way to earn recognition. A self-monitoring checklist gives UV agency and a visible path to the preferred activity; an appropriate participation signal (hand raised, contributing to discussion) earns the peer attention that calling out currently supplies."
+    }
+  },
+  {
+    "level": "High School",
+    "grade": "11th Grade",
+    "name": "WX",
+    "desc": "WX is an eleventh grade student in a separate classroom setting. WX typically follows directions and frequently offers to help staff with tasks in the classroom and around campus. When WX experiences a disappointment or is unable to have something he requested, intense perseveration and property destruction — pushing materials away, tearing items from the wall — may occur, and can escalate to aggression.",
+    "fn": {
+      "l": "Tangible / Access (Denied Request)",
+      "e": "WX is cooperative and helpful the rest of the time, so this is not escape from demands — he willingly takes on tasks. The behavior is triggered specifically by disappointment or being told \"no,\" and the perseveration keeps the denied item or activity front and center. The function is regaining access to what was requested, or protesting its loss."
+    },
+    "pr": {
+      "l": "Prime for \"No\" + First/Then + Pre-Taught Coping Routine",
+      "e": "Prepare WX for likely denials before they happen. Give advance notice, and turn \"no\" into \"not yet\" with a First/Then or a clear when/then so the request has a future path. Teach a coping routine (a break, deep breathing, a helper task) during calm times so it is available under stress. Keep his helper roles frequent so reinforcement is not tied only to getting every request granted."
+    },
+    "rs": {
+      "l": "Acknowledge Briefly, Redirect to Coping — Do Not Argue",
+      "e": "Do not over-explain or debate the denial in the moment; that feeds the perseveration. Briefly acknowledge the feeling, prompt the coping routine or a redirection to a preferred helper task, and give processing space. If property destruction or aggression occurs, follow your safety protocol — clear the area, protect people, stay calm and non-reactive. Re-engage once calm."
+    },
+    "rb": {
+      "l": "Teach \"Ask Again Later\" + Accepting No",
+      "e": "Give WX a functional way to handle denial: a phrase or card to request the item at an agreed later time, paired with a taught coping response that earns attention and a sense of control. Reinforce accepting \"no\" and using the coping routine heavily during calm practice, so those responses can compete with perseveration and destruction."
+    }
+  }
+];
+
+/* Teaching points + difficulty (1 = Foundational, 2 = Intermediate, 3 = Trap) — keyed by scenario name */
+const TEACHING = {
+  "AB": {
+    "diff": 1,
+    "tp": "Aggression only when peers reach for the toys → tangible. A personal set removes the competition entirely."
+  },
+  "CD": {
+    "diff": 2,
+    "tp": "Two behaviors at different times of day may have two functions — elopement (escape) vs. climbing (sensory). One plan won't fit both."
+  },
+  "EF": {
+    "diff": 2,
+    "tp": "The SIB escalated because withdrawing the demand at peak intensity reinforced it. Reduce the demand early, before the escalation."
+  },
+  "GH": {
+    "diff": 1,
+    "tp": "Escape is predictable by task type (paper/pencil). Change the format before trying to manage the aggression."
+  },
+  "IJ": {
+    "diff": 1,
+    "tp": "Same destination, same outcome every time → tangible (food). Remove access and schedule a real snack."
+  },
+  "KL": {
+    "diff": 2,
+    "tp": "Escalation to property destruction means low-level protests were reinforced by escape before. WAIT — the lecture is fuel."
+  },
+  "YZ": {
+    "diff": 3,
+    "tp": "Back-table test: same task, same teacher, no peers → no behavior. That isolates PEER attention. Coach the audience, not just the student."
+  },
+  "MN": {
+    "diff": 2,
+    "tp": "Escape at one specific moment — the doorway. Use the loved center + comfort object to make entering less aversive."
+  },
+  "OP": {
+    "diff": 2,
+    "tp": "Aggression appears only when the exit is blocked — same escape function, worse topography. Teach a break/pass instead of blocking."
+  },
+  "QR": {
+    "diff": 3,
+    "tp": "The trigger is loss of predictability, not a task. Deliver the calming item early in the sequence, never as the payoff at peak SIB."
+  },
+  "ST": {
+    "diff": 2,
+    "tp": "Two stacked escape events — the prompt triggers leaving, the redirection triggers aggression. Stop making redirection the first move."
+  },
+  "UV": {
+    "diff": 2,
+    "tp": "Refusal is escape (non-preferred classes only); the loud disruption adds a peer audience. Correct privately to remove half the payoff."
+  },
+  "WX": {
+    "diff": 2,
+    "tp": "Cooperative student — the trigger is denial/disappointment, not task demands. Function is access to the denied request; teach \"accepting no\" + a coping routine and don't argue the \"no\" in the moment."
+  }
+};
+SCENARIOS.forEach(s => { const t = TEACHING[s.name]; if (t) { s.tp = t.tp; s.diff = t.diff; } });
+
+/* ══════════════ STATE ══════════════ */
+let numTeams = 5;
+let timerLength = 90;
+let roundLimit = 0;               // 0 = all selected scenarios
+let deck = [];                    // scenarios actually played this game, in order
+let teams = [], scores = [], currentRound = 0;
+let scoreSnapshots = [];          // saves scores[] BEFORE each round is applied
+let timerSec = 90, timerRunning = false, timerID = null;
+let roundScores = [];
+const CATS = ['fn','pr','rs','rb'];
+
+/* ══════════════ HELPERS ══════════════ */
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => (
+    {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]
+  ));
+}
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ══════════════ SETUP ══════════════ */
+function setTeamCount(n) {
+  numTeams = n;
+  document.querySelectorAll('#cntBtns .cnt-btn').forEach((b,i) => b.classList.toggle('active', i+2 === n));
+  renderTeamRows();
+}
+function setTimer(sec) {
+  timerLength = sec;
+  const map = { 60:0, 90:1, 120:2 };
+  document.querySelectorAll('#timerBtns .opt-btn').forEach((b,i) => b.classList.toggle('active', i === map[sec]));
+}
+function setRoundLimit(n) {
+  roundLimit = n;
+  const order = [0,4,6,8,10];
+  document.querySelectorAll('#roundBtns .opt-btn').forEach((b,i) => b.classList.toggle('active', order[i] === n));
+  updateRoundHint();
+}
+
+function renderTeamRows() {
+  const c = document.getElementById('teamRows');
+  const existing = [];
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('ti' + i);
+    existing[i] = el ? el.value : `Team ${i+1}`;
+  }
+  c.innerHTML = '';
+  for (let i = 0; i < numTeams; i++) {
+    const r = document.createElement('div');
+    r.className = 't-row';
+    r.innerHTML = `<div class="t-dot" style="background:${COLORS[i]}"></div><input id="ti${i}" value="${esc(existing[i] || 'Team '+(i+1))}" />`;
+    c.appendChild(r);
+  }
+}
+
+function renderScenList() {
+  const groups = {};
+  SCENARIOS.forEach((s,i) => { (groups[s.level] = groups[s.level] || []).push({s,i}); });
+  let html = '';
+  Object.keys(groups).forEach(level => {
+    html += `<div class="scen-group"><div class="scen-group-hd">${esc(level)}</div>`;
+    groups[level].forEach(({s,i}) => {
+      const c = LVL_COLORS[s.level] || '#94a3b8';
+      html += `<label class="scen-item">
+        <input type="checkbox" id="scen-${i}" checked onchange="updateRoundHint()">
+        <span class="scen-cdot" style="background:${c}"></span>
+        <span>${esc(s.name)} — ${esc(s.grade)}</span></label>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('scenList').innerHTML = html;
+}
+
+function selectAllScen(val) {
+  SCENARIOS.forEach((_,i) => { const el = document.getElementById('scen-'+i); if (el) el.checked = val; });
+  updateRoundHint();
+}
+
+function countSelected() {
+  return SCENARIOS.reduce((n,_,i) => n + (document.getElementById('scen-'+i)?.checked ? 1 : 0), 0);
+}
+
+function updateRoundHint() {
+  const sel = countSelected();
+  const hint = document.getElementById('roundHint');
+  if (sel === 0) { hint.textContent = 'Select at least one scenario to play.'; return; }
+  if (roundLimit > 0 && roundLimit < sel) {
+    hint.textContent = `${sel} scenarios selected — ${roundLimit} will be picked at random each game.`;
+  } else {
+    hint.textContent = `${sel} scenario${sel===1?'':'s'} selected — all will be played.`;
+  }
+}
+
+(function initSetup() { renderTeamRows(); renderScenList(); updateRoundHint(); loadSettings(); })();
+
+function startGame() {
+  const pool = SCENARIOS.filter((_,i) => document.getElementById('scen-'+i)?.checked);
+  if (pool.length === 0) { alert('Select at least one scenario to play.'); return; }
+
+  if (roundLimit > 0 && roundLimit < pool.length) {
+    const idx = pool.map(s => SCENARIOS.indexOf(s));
+    for (let k = idx.length-1; k > 0; k--) {
+      const j = Math.floor(Math.random() * (k+1));
+      [idx[k], idx[j]] = [idx[j], idx[k]];
+    }
+    deck = idx.slice(0, roundLimit).sort((a,b) => a-b).map(i => SCENARIOS[i]);
+  } else {
+    deck = pool;
+  }
+
+  teams = []; scores = []; scoreSnapshots = [];
+  for (let i = 0; i < numTeams; i++) {
+    teams.push(document.getElementById('ti'+i).value.trim() || `Team ${i+1}`);
+    scores.push(0);
+  }
+  currentRound = 0;
+  saveSettings();
+  loadRound();
+}
+
+/* ══════════════ ROUND ══════════════ */
+function loadRound() {
+  show('round');
+  stopTimer(); timerSec = timerLength; renderTimer();
+  const btn = document.getElementById('timerBtn');
+  btn.textContent = 'Start Timer';
+  btn.classList.add('go');
+
+  const s = deck[currentRound];
+  const lc = LVL_COLORS[s.level] || '#1d72c3';
+  document.getElementById('levelPill').style.borderLeftColor = lc;
+  document.getElementById('pillLevel').textContent = s.level;
+  document.getElementById('pillGrade').textContent = s.grade;
+  document.getElementById('scName').textContent = s.name;
+  document.getElementById('scBody').textContent = s.desc;
+  setScenarioImg('scImg', s.name);
+
+  document.getElementById('roundBackBtn').disabled = (currentRound <= 0);
+  renderProgress();
+  renderMini('miniBar1');
+}
+
+function toggleTimer() {
+  const btn = document.getElementById('timerBtn');
+  if (timerRunning) {
+    stopTimer();
+    btn.textContent = 'Resume';
+  } else {
+    if (timerSec <= 0) return;
+    timerRunning = true;
+    btn.textContent = 'Pause';
+    timerID = setInterval(() => {
+      timerSec--;
+      renderTimer();
+      if (timerSec <= 0) {
+        stopTimer();
+        document.getElementById('timerNum').textContent = 'TIME';
+        btn.textContent = 'Start Timer';
+        btn.classList.add('go');
+        beep();
+      }
+    }, 1000);
+  }
+}
+
+function stopTimer() { clearInterval(timerID); timerID = null; timerRunning = false; }
+
+function renderTimer() {
+  const m = Math.floor(timerSec / 60), s = timerSec % 60;
+  const el = document.getElementById('timerNum');
+  el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+  el.className = 'timer-num' + (timerSec <= 10 ? ' danger' : timerSec <= 30 ? ' warn' : '');
+}
+
+function goReveal() {
+  stopTimer();
+  const s = deck[currentRound];
+  document.getElementById('revTag').textContent   = `Round ${currentRound+1} of ${deck.length}`;
+  const diffLabels = ['Foundational','Intermediate','Trap'];
+  document.getElementById('revBadge').textContent = `${s.level} · ${s.grade}` + (s.diff ? ` · ${diffLabels[s.diff-1]}` : '');
+  document.getElementById('revName').textContent  = s.name;
+  document.getElementById('revDesc').textContent  = s.desc;
+  setScenarioImg('revImg', s.name);
+
+  document.getElementById('lFn').textContent = s.fn.l; document.getElementById('eFn').textContent = s.fn.e;
+  document.getElementById('lPr').textContent = s.pr.l; document.getElementById('ePr').textContent = s.pr.e;
+  document.getElementById('lRs').textContent = s.rs.l; document.getElementById('eRs').textContent = s.rs.e;
+  document.getElementById('lRb').textContent = s.rb.l; document.getElementById('eRb').textContent = s.rb.e;
+
+  CATS.forEach(c => document.getElementById('card'+cap(c)).classList.remove('revealed'));
+  ['pr','rs','rb'].forEach(k => {
+    const c = document.getElementById('card'+cap(k));
+    c.classList.add('pending');
+    const lt = c.querySelector('.a-lock-text');
+    if (lt) lt.textContent = 'Reveal Function First';
+  });
+  roundScores = teams.map(() => ({ fn:false, pr:false, rs:false, rb:false, bonus:0 }));
+  document.getElementById('nextBtn').textContent = currentRound < deck.length-1 ? 'Next Round →' : 'See Final Scores →';
+  document.getElementById('revBackBtn').disabled = (currentRound <= 0);
+  buildScoreGrid();
+  renderMini('miniBar2');
+  show('reveal');
+}
+
+function reveal(key) {
+  // Function-first gate: strategy cards stay locked until Function is revealed
+  const fnRevealed = document.getElementById('cardFn').classList.contains('revealed');
+  if (key !== 'fn' && !fnRevealed) return;
+  const el = document.getElementById('card'+cap(key));
+  if (!el.classList.contains('revealed')) el.classList.add('revealed');
+  if (key === 'fn') unlockStrategies();
+}
+function unlockStrategies() {
+  ['pr','rs','rb'].forEach(k => {
+    const c = document.getElementById('card'+cap(k));
+    c.classList.remove('pending');
+    const lt = c.querySelector('.a-lock-text');
+    if (lt) lt.textContent = 'Click to Reveal';
+  });
+}
+
+/* ══════════════ NAVIGATION ══════════════ */
+function nextRound() {
+  scoreSnapshots[currentRound] = [...scores];
+  teams.forEach((_,ti) => {
+    const base = CATS.reduce((s,c) => s + (roundScores[ti][c] ? 2 : 0), 0);
+    const allRight = CATS.every(c => roundScores[ti][c]);
+    scores[ti] += base + roundScores[ti].bonus + (allRight ? 2 : 0);
+  });
+  currentRound++;
+  currentRound >= deck.length ? showFinal() : loadRound();
+}
+
+function prevRound() {
+  if (currentRound <= 0) return;
+  currentRound--;
+  scores = scoreSnapshots[currentRound]
+    ? [...scoreSnapshots[currentRound]]
+    : new Array(teams.length).fill(0);
+  goReveal();
+}
+
+/* ══════════════ SCORING ══════════════ */
+function buildScoreGrid() {
+  const g = document.getElementById('scoreGrid');
+  const tbl = document.createElement('table');
+  tbl.className = 'sg-table';
+
+  let hRow = '<tr><th></th>';
+  teams.forEach((n,i) => { hRow += `<th style="color:${COLORS[i]}">${esc(n.length>9?n.slice(0,9)+'…':n)}</th>`; });
+  hRow += '</tr>';
+
+  let rows = '';
+  CATS.forEach(cat => {
+    const m = CAT_META[cat];
+    rows += `<tr><td class="sg-row-label"><span class="sg-dot" style="background:${m.c}"></span>${m.name}</td>`;
+    teams.forEach((_,ti) => {
+      rows += `<td><button class="sg-btn" id="sb-${cat}-${ti}" onclick="toggleSB('${cat}',${ti})">+2</button></td>`;
+    });
+    rows += '</tr>';
+  });
+  rows += '<tr><td class="sg-row-label">Bonus pts</td>';
+  teams.forEach((_,ti) => {
+    rows += `<td><button class="sg-btn bonus-btn" id="bon-${ti}" onclick="cycleBonus(${ti})">+0</button></td>`;
+  });
+  rows += '</tr>';
+  rows += '<tr><td class="sg-row-label" style="font-weight:700;color:var(--text)">Round total</td>';
+  teams.forEach((_,ti) => {
+    rows += `<td><div class="sg-total" id="rtot-${ti}">0</div></td>`;
+  });
+  rows += '</tr>';
+
+  tbl.innerHTML = hRow + rows;
+  g.innerHTML = ''; g.appendChild(tbl);
+}
+
+function toggleSB(cat, ti) {
+  roundScores[ti][cat] = !roundScores[ti][cat];
+  const btn = document.getElementById(`sb-${cat}-${ti}`);
+  btn.classList.toggle('on', roundScores[ti][cat]);
+  btn.textContent = roundScores[ti][cat] ? '✓ +2' : '+2';
+  recalcTotals();
+}
+
+function cycleBonus(ti) {
+  roundScores[ti].bonus = (roundScores[ti].bonus + 1) % 5;
+  document.getElementById(`bon-${ti}`).textContent = `+${roundScores[ti].bonus}`;
+  recalcTotals();
+}
+
+function recalcTotals() {
+  teams.forEach((_,ti) => {
+    const base = CATS.reduce((s,c) => s + (roundScores[ti][c] ? 2 : 0), 0);
+    const allRight = CATS.every(c => roundScores[ti][c]);
+    const total = base + roundScores[ti].bonus + (allRight ? 2 : 0);
+    const el = document.getElementById(`rtot-${ti}`);
+    el.textContent = total;
+    el.style.color = allRight ? '#ca8a04' : '';
+    el.title = allRight ? 'All four correct — includes +2 bonus' : '';
+  });
+}
+
+/* ══════════════ WILD CARD ══════════════ */
+function openWild() {
+  ['wChallenger','wChallenged'].forEach((id,idx) => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = teams.map((n,i) => `<option value="${i}">${esc(n)}</option>`).join('');
+    if (idx === 1) sel.selectedIndex = Math.min(1, teams.length-1);
+  });
+  document.getElementById('wildOverlay').classList.add('open');
+}
+
+function closeWild() { document.getElementById('wildOverlay').classList.remove('open'); }
+
+function resolveWild(challengerWins) {
+  const ci = parseInt(document.getElementById('wChallenger').value);
+  const gi = parseInt(document.getElementById('wChallenged').value);
+  if (ci === gi) { alert('Challenger and challenged must be different teams.'); return; }
+  if (challengerWins) scores[ci] += 2; else scores[ci] = Math.max(0, scores[ci]-1);
+  closeWild();
+  renderMini('miniBar2');
+}
+
+/* ══════════════ FINAL ══════════════ */
+function showFinal() {
+  show('final');
+  const ranked = teams.map((n,i) => ({n, s:scores[i], c:COLORS[i]})).sort((a,b)=>b.s-a.s);
+  // Assign competition ranks (ties share a rank)
+  let lastScore = null, lastRank = 0;
+  ranked.forEach((t,i) => { if (t.s !== lastScore) { lastRank = i+1; lastScore = t.s; } t.rank = lastRank; });
+  const tieCount = {};
+  ranked.forEach(t => { tieCount[t.rank] = (tieCount[t.rank]||0) + 1; });
+  document.getElementById('leaderboard').innerHTML = ranked.map((t) => {
+    const place = (tieCount[t.rank] > 1 ? 'T-' : '') + (MEDALS[t.rank-1] || (t.rank+'th'));
+    return `
+    <div class="lb-row ${t.rank===1?'top':''}">
+      <span class="lb-place">${place}</span>
+      <span class="lb-cdot" style="background:${t.c}"></span>
+      <span class="lb-name">${esc(t.n)}</span>
+      <span class="lb-score">${t.s} pts</span>
+    </div>`;
+  }).join('');
+  buildAnswerKey();
+}
+
+function resetGame() { scores = teams.map(()=>0); scoreSnapshots = []; currentRound = 0; show('setup'); }
+
+/* ══════════════ RENDER HELPERS ══════════════ */
+function renderProgress() {
+  const c = document.getElementById('progDots');
+  c.innerHTML = deck.map((_,i) =>
+    `<div class="dot-step ${i<currentRound?'done':i===currentRound?'now':''}"></div>`
+  ).join('');
+}
+
+function setScenarioImg(id, name) {
+  const img = document.getElementById(id);
+  if (!img) return;
+  img.onerror = () => { img.style.display = 'none'; };
+  img.style.display = '';
+  img.src = 'Visuals/scenario-' + name + '.png';
+}
+
+function renderMini(id) {
+  const c = document.getElementById(id);
+  if (!c) return;
+  c.innerHTML = teams.map((n,i) => `
+    <div class="mini-chip">
+      <span class="cdot" style="background:${COLORS[i]}"></span>
+      <span>${esc(n.length>8?n.slice(0,8)+'…':n)}</span>
+      <span class="cpts">${scores[i]}</span>
+    </div>`).join('');
+}
+
+/* ══════════════ AUDIO (time's-up chime) ══════════════ */
+let audioCtx = null;
+function beep() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const now = audioCtx.currentTime;
+    [0, 0.28].forEach(t => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = 880;
+      o.connect(g); g.connect(audioCtx.destination);
+      g.gain.setValueAtTime(0.0001, now + t);
+      g.gain.exponentialRampToValueAtTime(0.3, now + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + t + 0.22);
+      o.start(now + t); o.stop(now + t + 0.24);
+    });
+  } catch (e) { /* audio unavailable — silent */ }
+}
+
+/* ══════════════ SETTINGS PERSISTENCE ══════════════ */
+function saveSettings() {
+  try {
+    const sel = [];
+    SCENARIOS.forEach((_,i) => { if (document.getElementById('scen-'+i)?.checked) sel.push(i); });
+    const names = [];
+    for (let i=0;i<numTeams;i++){ const el=document.getElementById('ti'+i); names.push(el?el.value:''); }
+    localStorage.setItem('btp_settings', JSON.stringify({ numTeams, timerLength, roundLimit, sel, names }));
+  } catch (e) {}
+}
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem('btp_settings');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s.numTeams) setTeamCount(s.numTeams);
+    if (s.timerLength) setTimer(s.timerLength);
+    if (typeof s.roundLimit === 'number') setRoundLimit(s.roundLimit);
+    if (Array.isArray(s.names)) s.names.forEach((n,i) => { const el=document.getElementById('ti'+i); if (el && n) el.value = n; });
+    if (Array.isArray(s.sel) && s.sel.length) {
+      SCENARIOS.forEach((_,i) => { const el=document.getElementById('scen-'+i); if (el) el.checked = s.sel.includes(i); });
+      updateRoundHint();
+    }
+  } catch (e) {}
+}
+
+/* ══════════════ ANSWER-KEY HANDOUT ══════════════ */
+function buildAnswerKey() {
+  const cats = [['fn','Function'],['pr','Proactive Strategy'],['rs','Response Strategy'],['rb','Replacement Behavior']];
+  const diffLabels = ['Foundational','Intermediate','Trap'];
+  let html = `<div class="ak-hd">Build the Plan — Answer Key</div><div class="ak-sub">Behavior Strategy Card Game · Facilitator reference</div>`;
+  deck.forEach((s,i) => {
+    html += `<div class="ak-item"><h3>${i+1}. ${esc(s.name)}</h3>`;
+    html += `<div class="ak-meta">${esc(s.level)} · ${esc(s.grade)}${s.diff ? ' · '+diffLabels[s.diff-1] : ''}</div>`;
+    html += `<div class="ak-desc">${esc(s.desc)}</div>`;
+    cats.forEach(([k,label]) => { html += `<div class="ak-ans"><b>${label}:</b> ${esc(s[k].l)} — ${esc(s[k].e)}</div>`; });
+    if (s.tp) html += `<div class="ak-teach">Teaching point: ${esc(s.tp)}</div>`;
+    html += `</div>`;
+  });
+  document.getElementById('answerKey').innerHTML = html;
+}
+function printAnswerKey() {
+  buildAnswerKey();
+  document.body.classList.add('print-key');
+  const cleanup = () => { document.body.classList.remove('print-key'); window.removeEventListener('afterprint', cleanup); };
+  window.addEventListener('afterprint', cleanup);
+  window.print();
+}
+
+/* ══════════════ TEXT SIZE ══════════════ */
+function toggleTextSize() {
+  document.body.classList.toggle('big-text');
+  const b = document.getElementById('txtToggle');
+  if (b) b.textContent = document.body.classList.contains('big-text') ? 'A− Smaller text' : 'A+ Larger text';
+}
+
+/* ══════════════ KEYBOARD SHORTCUTS (facilitator) ══════════════ */
+document.addEventListener('keydown', e => {
+  if (['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  const roundActive  = document.getElementById('round').classList.contains('active');
+  const revealActive = document.getElementById('reveal').classList.contains('active');
+  if (roundActive) {
+    if (e.code === 'Space')      { e.preventDefault(); toggleTimer(); }
+    else if (e.code === 'ArrowRight') { e.preventDefault(); goReveal(); }
+    else if (e.code === 'ArrowLeft')  { e.preventDefault(); if (currentRound > 0) prevRound(); }
+  } else if (revealActive) {
+    if (e.code === 'ArrowRight') { e.preventDefault(); nextRound(); }
+    else if (e.code === 'ArrowLeft') { e.preventDefault(); if (currentRound > 0) prevRound(); }
+    else if (e.code === 'KeyF')  { reveal('fn'); }
+  }
+});
+</script>
+</body>
+</html>
