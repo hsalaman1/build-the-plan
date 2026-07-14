@@ -342,6 +342,22 @@ body.big-text .rev-desc { font-size: 0.96rem; }
 .m-lose { background: #fff5f5; border-color: var(--red); color: #7f1d1d; }
 .m-cancel { background: var(--bg); border-color: var(--bg3); color: var(--muted); }
 
+/* ── NEW VISUALS (setup + final illustrations, function reference) ── */
+.setup-illustration { display:block; width:min(100%,440px); aspect-ratio:3/2; object-fit:cover; border:2px solid var(--brand); border-radius:14px; box-shadow:var(--shadow); }
+.func-ref-btn { padding:0.6rem 1.2rem; border-radius:10px; background:var(--white); border:1.5px solid var(--brand); color:var(--brand); font-size:0.85rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background var(--ease); }
+.func-ref-btn:hover { background:#eef5fc; }
+.func-ref-modal { max-width:640px; }
+.func-ref-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; margin-bottom:1.2rem; }
+@media (max-width:760px){ .func-ref-grid { grid-template-columns:1fr; } }
+.function-ref-card { display:flex; gap:0.75rem; align-items:center; background:var(--bg); border:1.5px solid var(--bg3); border-radius:12px; padding:0.65rem; margin:0; }
+.function-ref-card img { width:64px; height:64px; aspect-ratio:1; object-fit:cover; border-radius:12px; flex-shrink:0; }
+.function-ref-card figcaption { display:flex; flex-direction:column; gap:0.15rem; }
+.function-ref-card figcaption strong { font-size:0.95rem; color:var(--text); }
+.function-ref-card figcaption span { font-size:0.75rem; color:var(--muted); line-height:1.45; }
+.final-main { display:grid; grid-template-columns:minmax(260px,380px) minmax(320px,440px); align-items:center; gap:1.25rem; width:min(100%,900px); }
+.final-illustration { width:100%; aspect-ratio:3/2; object-fit:cover; border:2px solid var(--brand); border-radius:14px; box-shadow:var(--shadow); }
+@media (max-width:760px){ .final-main { grid-template-columns:1fr; max-width:440px; } .final-illustration { max-height:220px; } }
+
 /* ── PRINT ── */
 @media print {
   .screen { display: none !important; }
@@ -351,6 +367,7 @@ body.big-text .rev-desc { font-size: 0.96rem; }
   body:not(.print-key) #final { display: flex !important; }
   body:not(.print-key) #final .game-header { display: flex !important; }
   .final-btns, .btn-sm, .btn-print { display: none !important; }
+  .setup-illustration, .final-illustration { display: none !important; }
   .lb-row { border: 1px solid #ccc; box-shadow: none; }
   .lb-score { color: var(--brand); }
   /* Answer-key mode */
@@ -370,6 +387,8 @@ body.big-text .rev-desc { font-size: 0.96rem; }
       <h1>Build the <em>Plan</em></h1>
       <p>A Behavior Strategy Card Game</p>
     </div>
+    <img class="setup-illustration" src="Visuals/game-setup-collaboration.png" alt="Educators collaborating to build a behavior support plan" onerror="this.style.display='none'">
+    <button class="func-ref-btn" onclick="openFuncRef()">Function Reference</button>
     <div class="setup-box">
       <h2>Teams</h2>
       <div class="count-row">
@@ -527,7 +546,10 @@ body.big-text .rev-desc { font-size: 0.96rem; }
       <h1>Game <em>Over</em></h1>
       <p>Build the Plan &nbsp;·&nbsp; Behavior Strategy Card Game</p>
     </div>
-    <div class="leaderboard" id="leaderboard"></div>
+    <div class="final-main">
+      <img class="final-illustration" src="Visuals/game-final-celebration.png" alt="Educators celebrating a completed behavior support plan" onerror="this.style.display='none'">
+      <div class="leaderboard" id="leaderboard"></div>
+    </div>
     <div class="final-btns">
       <button class="btn-sm" onclick="resetGame()">Play Again</button>
       <button class="btn-print" onclick="window.print()">Print Scores</button>
@@ -549,6 +571,35 @@ body.big-text .rev-desc { font-size: 0.96rem; }
       <button class="m-btn m-win"    onclick="resolveWild(true)">Challenger wins (+2)</button>
       <button class="m-btn m-lose"   onclick="resolveWild(false)">Challenged defends (−1)</button>
       <button class="m-btn m-cancel" onclick="closeWild()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Function Reference Modal -->
+<div class="overlay" id="funcRefOverlay" role="dialog" aria-modal="true" aria-labelledby="funcRefTitle">
+  <div class="modal func-ref-modal">
+    <h2 id="funcRefTitle">Function Reference</h2>
+    <p>The four common reasons a behavior keeps happening. Figure out the function first, then pick strategies that fit it.</p>
+    <div class="func-ref-grid">
+      <figure class="function-ref-card">
+        <img src="Visuals/icon-escape.png" alt="Student moving away from a difficult classroom task">
+        <figcaption><strong>Escape</strong><span>Gets away from or delays a task, demand, person, or setting.</span></figcaption>
+      </figure>
+      <figure class="function-ref-card">
+        <img src="Visuals/icon-attention.png" alt="Student seeking a reaction from adults or peers">
+        <figcaption><strong>Attention</strong><span>Gets a reaction from other people: looking, talking, laughing, helping, or scolding.</span></figcaption>
+      </figure>
+      <figure class="function-ref-card">
+        <img src="Visuals/icon-tangible.png" alt="Student reaching for a preferred item">
+        <figcaption><strong>Tangible</strong><span>Gets a wanted item or activity, like a toy, food, a device, or a turn.</span></figcaption>
+      </figure>
+      <figure class="function-ref-card">
+        <img src="Visuals/icon-automatic.png" alt="Student self-soothing with a calming movement">
+        <figcaption><strong>Automatic / Sensory</strong><span>Feels good or eases discomfort on its own, with no help from other people.</span></figcaption>
+      </figure>
+    </div>
+    <div class="modal-btns">
+      <button class="m-btn m-cancel" onclick="closeFuncRef()">Close</button>
     </div>
   </div>
 </div>
@@ -1209,6 +1260,32 @@ function openWild() {
 }
 
 function closeWild() { document.getElementById('wildOverlay').classList.remove('open'); }
+
+/* ══════════════ FUNCTION REFERENCE ══════════════ */
+function openFuncRef() {
+  var ov = document.getElementById('funcRefOverlay');
+  ov.classList.add('open');
+  var btn = ov.querySelector('.m-cancel');
+  if (btn) btn.focus();
+}
+function closeFuncRef() {
+  document.getElementById('funcRefOverlay').classList.remove('open');
+  var b = document.querySelector('.func-ref-btn');
+  if (b) b.focus();
+}
+/* Escape closes any open overlay; Tab is trapped inside it (accessibility). */
+document.addEventListener('keydown', function(e) {
+  var open = document.querySelector('.overlay.open');
+  if (!open) return;
+  if (e.key === 'Escape') { open.classList.remove('open'); return; }
+  if (e.key === 'Tab') {
+    var f = open.querySelectorAll('button, select, a[href], input, [tabindex]:not([tabindex="-1"])');
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
 
 function resolveWild(challengerWins) {
   const ci = parseInt(document.getElementById('wChallenger').value);
