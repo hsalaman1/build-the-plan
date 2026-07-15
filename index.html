@@ -429,6 +429,7 @@ body.big-text .rev-desc { font-size: 0.96rem; }
 
       <button class="btn-primary" onclick="startGame()">Start Game &nbsp;→</button>
     </div>
+    <button class="admin-entry-link" onclick="promptAdmin()">Admin</button>
   </div>
 </div>
 
@@ -600,6 +601,105 @@ body.big-text .rev-desc { font-size: 0.96rem; }
     </div>
     <div class="modal-btns">
       <button class="m-btn m-cancel" onclick="closeFuncRef()">Close</button>
+    </div>
+  </div>
+</div>
+
+<style id="admin-styles">
+.admin-entry-link{ background:none; border:none; color:#94a3b8; font-size:.8rem; cursor:pointer; text-decoration:underline; margin-top:.4rem; }
+.admin-entry-link:hover{ color:#1d72c3; }
+.admin-modal{ max-width:860px; width:94vw; max-height:90vh; overflow-y:auto; text-align:left; }
+.admin-hd{ display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:.3rem; }
+.admin-hd h2{ margin:0; }
+.admin-note{ font-size:.9rem; opacity:.8; margin:.2rem 0 .9rem; }
+.admin-toolbar{ display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin-bottom:1rem; }
+.admin-import-lbl{ cursor:pointer; }
+.admin-count{ margin-left:auto; font-size:.85rem; opacity:.7; }
+.admin-list{ display:flex; flex-direction:column; gap:.4rem; }
+.adm-row{ display:flex; justify-content:space-between; align-items:center; gap:.6rem; padding:.55rem .7rem; border:1px solid #e2e8f0; border-radius:8px; background:#f8fafc; }
+.adm-row-info{ display:flex; flex-direction:column; min-width:0; }
+.adm-row-name{ font-weight:700; color:#1d72c3; }
+.adm-row-meta{ font-size:.8rem; opacity:.7; }
+.adm-row-btns{ display:flex; gap:.3rem; flex-shrink:0; }
+.adm-mini{ border:1px solid #cbd5e1; background:#fff; border-radius:6px; padding:.25rem .55rem; cursor:pointer; font-size:.82rem; }
+.adm-mini:hover{ background:#eef2f7; }
+.adm-del{ color:#dc2626; border-color:#fecaca; }
+.admin-form{ display:flex; flex-direction:column; gap:.7rem; }
+.admin-form > label{ display:flex; flex-direction:column; gap:.25rem; font-size:.82rem; font-weight:600; color:#334155; }
+.admin-form input, .admin-form select, .admin-form textarea{ font:inherit; font-weight:400; padding:.45rem .55rem; border:1px solid #cbd5e1; border-radius:7px; width:100%; box-sizing:border-box; }
+.admin-form textarea{ resize:vertical; }
+.af-row{ display:flex; gap:.7rem; flex-wrap:wrap; }
+.af-row label{ flex:1; min-width:180px; display:flex; flex-direction:column; gap:.25rem; font-size:.82rem; font-weight:600; color:#334155; }
+.af-card{ border:1px solid #e2e8f0; border-left-width:5px; border-radius:8px; padding:.6rem .7rem; display:flex; flex-direction:column; gap:.4rem; }
+.af-card-hd{ font-weight:700; font-size:.85rem; }
+.af-fn{ border-left-color:#dc2626; } .af-fn .af-card-hd{ color:#dc2626; }
+.af-pr{ border-left-color:#16a34a; } .af-pr .af-card-hd{ color:#16a34a; }
+.af-rs{ border-left-color:#d97706; } .af-rs .af-card-hd{ color:#d97706; }
+.af-rb{ border-left-color:#7c3aed; } .af-rb .af-card-hd{ color:#7c3aed; }
+.admin-publish-bar{ display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin:0 0 1rem; padding:.6rem .7rem; border:1px dashed #cbd5e1; border-radius:8px; background:#f1f5f9; }
+.gh-status{ margin-left:auto; font-size:.82rem; font-weight:600; padding:.2rem .6rem; border-radius:20px; }
+.gh-on{ color:#166534; background:#dcfce7; }
+.gh-off{ color:#9a3412; background:#ffedd5; }
+@media print{ #adminOverlay{ display:none !important; } }
+</style>
+
+<!-- ══════════════ ADMIN MODE (Stage 1: local edit + export/import) ══════════════ -->
+<div class="overlay" id="adminOverlay" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+  <div class="modal admin-modal">
+    <div class="admin-hd">
+      <h2 id="adminTitle">Scenario Admin</h2>
+      <button class="m-btn m-cancel" onclick="closeAdmin()">Close</button>
+    </div>
+
+    <div id="adminListPane">
+      <p class="admin-note">Edits save to this browser instantly and work offline. Use <b>Export backup</b> to save a copy or to publish later.</p>
+      <div class="admin-toolbar">
+        <button class="m-btn m-win" onclick="adminAddNew()">+ Add Scenario</button>
+        <button class="m-btn" onclick="adminExport()">Export backup</button>
+        <label class="m-btn admin-import-lbl">Import<input type="file" accept="application/json,.json" onchange="adminImportFile(this)" hidden></label>
+        <button class="m-btn m-cancel" onclick="adminReset()">Reset to defaults</button>
+        <span class="admin-count" id="adminCount"></span>
+      </div>
+      <div class="admin-publish-bar">
+        <button class="m-btn" id="ghConnectBtn" onclick="setGhToken()">Connect GitHub</button>
+        <button class="m-btn m-win" id="ghPublishBtn" onclick="adminPublish()">Publish to Live</button>
+        <button class="m-btn" onclick="adminReloadPublished()">Reload from published</button>
+        <span class="gh-status gh-off" id="ghStatus">Not connected</span>
+      </div>
+      <div class="admin-list" id="adminList"></div>
+    </div>
+
+    <div id="adminEditPane" style="display:none">
+      <h3 id="adminEditTitle">Edit Scenario</h3>
+      <div class="admin-form">
+        <div class="af-row">
+          <label>Name / code<input id="af_name" type="text" placeholder="e.g., AB"></label>
+          <label>Grade<input id="af_grade" type="text" placeholder="e.g., Kindergarten"></label>
+        </div>
+        <div class="af-row">
+          <label>Level<select id="af_level"></select></label>
+          <label>Difficulty<select id="af_diff">
+            <option value="1">Foundational</option>
+            <option value="2">Intermediate</option>
+            <option value="3">Trap</option>
+          </select></label>
+        </div>
+        <label>Scenario description<textarea id="af_desc" rows="4"></textarea></label>
+        <label>Teaching point<textarea id="af_tp" rows="2"></textarea></label>
+
+        <div class="af-card af-fn"><div class="af-card-hd">Function</div>
+          <input id="af_fn_l" type="text" placeholder="Short label"><textarea id="af_fn_e" rows="3" placeholder="Explanation"></textarea></div>
+        <div class="af-card af-pr"><div class="af-card-hd">Proactive Strategy</div>
+          <input id="af_pr_l" type="text" placeholder="Short label"><textarea id="af_pr_e" rows="3" placeholder="Explanation"></textarea></div>
+        <div class="af-card af-rs"><div class="af-card-hd">Response Strategy</div>
+          <input id="af_rs_l" type="text" placeholder="Short label"><textarea id="af_rs_e" rows="3" placeholder="Explanation"></textarea></div>
+        <div class="af-card af-rb"><div class="af-card-hd">Replacement Behavior</div>
+          <input id="af_rb_l" type="text" placeholder="Short label"><textarea id="af_rb_e" rows="3" placeholder="Explanation"></textarea></div>
+      </div>
+      <div class="modal-btns" style="margin-top:1rem">
+        <button class="m-btn m-win" onclick="adminSave()">Save</button>
+        <button class="m-btn m-cancel" onclick="adminCancelEdit()">Cancel</button>
+      </div>
     </div>
   </div>
 </div>
@@ -944,6 +1044,35 @@ const TEACHING = {
   }
 };
 SCENARIOS.forEach(s => { const t = TEACHING[s.name]; if (t) { s.tp = t.tp; s.diff = t.diff; } });
+
+/* ══════════════ ADMIN: SCENARIO STORAGE (Stage 1) ══════════════ */
+const SCEN_KEY = 'btp_scenarios';
+const SCEN_DEFAULTS = JSON.parse(JSON.stringify(SCENARIOS)); /* baked-in fallback, already merged with tp/diff */
+function saveScenariosToStore() {
+  try { localStorage.setItem(SCEN_KEY, JSON.stringify(SCENARIOS)); return true; }
+  catch (e) { return false; }
+}
+(function loadScenarios() {
+  /* Precedence: local draft (localStorage) → published scenarios.json (online) → baked-in defaults.
+     Only admin edits write localStorage; a plain fetch never does, so non-editors always get the latest publish. */
+  try {
+    const raw = localStorage.getItem(SCEN_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr) && arr.length) { SCENARIOS.length = 0; arr.forEach(s => SCENARIOS.push(s)); return; }
+    }
+  } catch (e) {}
+  /* no local draft → try the published file (fails silently offline / on file://, keeping baked-in defaults) */
+  fetch('scenarios.json', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(arr => {
+      if (Array.isArray(arr) && arr.length) {
+        SCENARIOS.length = 0; arr.forEach(s => SCENARIOS.push(s));
+        try { if (typeof renderScenList === 'function') { renderScenList(); updateRoundHint(); } } catch (e) {}
+      }
+    })
+    .catch(() => {});
+})();
 
 /* ══════════════ STATE ══════════════ */
 let numTeams = 5;
@@ -1436,6 +1565,231 @@ document.addEventListener('keydown', e => {
     else if (e.code === 'KeyF')  { reveal('fn'); }
   }
 });
+
+/* ══════════════ ADMIN MODE (Stage 1: local edit + export/import) ══════════════ */
+const ADMIN_PASS = 'plan';   /* ← change this to your own admin password */
+const LEVEL_OPTIONS = ['Early Childhood','Primary Grades','Elementary','Intermediate Grades','Middle School','High School'];
+const DIFF_LABELS = ['Foundational','Intermediate','Trap'];
+let adminEditIndex = -1;   /* -1 = adding new; >=0 = editing that index */
+
+function promptAdmin() {
+  const p = prompt('Enter admin password:');
+  if (p === null) return;
+  if (p !== ADMIN_PASS) { alert('Incorrect password.'); return; }
+  openAdmin();
+}
+function openAdmin() {
+  renderAdminList();
+  showAdminList();
+  updateGhStatus();
+  document.getElementById('adminOverlay').classList.add('open');
+}
+function closeAdmin() {
+  document.getElementById('adminOverlay').classList.remove('open');
+  syncSetupList();
+}
+function syncSetupList() { try { renderScenList(); updateRoundHint(); } catch (e) {} }
+function showAdminList() {
+  document.getElementById('adminListPane').style.display = '';
+  document.getElementById('adminEditPane').style.display = 'none';
+}
+function showAdminEdit() {
+  document.getElementById('adminListPane').style.display = 'none';
+  document.getElementById('adminEditPane').style.display = '';
+}
+function renderAdminList() {
+  let html = '';
+  SCENARIOS.forEach((s,i) => {
+    const diffTxt = (s.diff && DIFF_LABELS[s.diff-1]) ? DIFF_LABELS[s.diff-1] : '';
+    html += '<div class="adm-row">'
+      + '<div class="adm-row-info">'
+      + '<span class="adm-row-name">' + esc(s.name || '(no name)') + '</span>'
+      + '<span class="adm-row-meta">' + esc(s.level || '') + (s.grade ? ' · ' + esc(s.grade) : '') + (diffTxt ? ' · ' + esc(diffTxt) : '') + '</span>'
+      + '</div>'
+      + '<div class="adm-row-btns">'
+      + '<button class="adm-mini" onclick="adminMove(' + i + ',-1)" title="Move up">↑</button>'
+      + '<button class="adm-mini" onclick="adminMove(' + i + ',1)" title="Move down">↓</button>'
+      + '<button class="adm-mini" onclick="adminEdit(' + i + ')">Edit</button>'
+      + '<button class="adm-mini adm-del" onclick="adminDelete(' + i + ')">Delete</button>'
+      + '</div></div>';
+  });
+  document.getElementById('adminList').innerHTML = html || '<p style="opacity:.7">No scenarios yet. Use “+ Add Scenario”.</p>';
+  document.getElementById('adminCount').textContent = SCENARIOS.length + ' scenario' + (SCENARIOS.length === 1 ? '' : 's');
+}
+function adminMove(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= SCENARIOS.length) return;
+  const t = SCENARIOS[i]; SCENARIOS[i] = SCENARIOS[j]; SCENARIOS[j] = t;
+  saveScenariosToStore(); renderAdminList(); syncSetupList();
+}
+function adminDelete(i) {
+  if (!confirm('Delete scenario "' + (SCENARIOS[i].name || '') + '"? This cannot be undone. Export a backup first if unsure.')) return;
+  SCENARIOS.splice(i, 1);
+  saveScenariosToStore(); renderAdminList(); syncSetupList();
+}
+function adminAddNew() {
+  adminEditIndex = -1;
+  fillAdminForm({ level: LEVEL_OPTIONS[0], grade:'', name:'', desc:'', diff:1, tp:'',
+    fn:{l:'',e:''}, pr:{l:'',e:''}, rs:{l:'',e:''}, rb:{l:'',e:''} });
+  document.getElementById('adminEditTitle').textContent = 'Add Scenario';
+  showAdminEdit();
+}
+function adminEdit(i) {
+  adminEditIndex = i;
+  fillAdminForm(SCENARIOS[i]);
+  document.getElementById('adminEditTitle').textContent = 'Edit Scenario';
+  showAdminEdit();
+}
+function fillAdminForm(s) {
+  const g = id => document.getElementById(id);
+  const lvlSel = g('af_level'); lvlSel.innerHTML = '';
+  const levels = LEVEL_OPTIONS.slice();
+  if (s.level && levels.indexOf(s.level) === -1) levels.push(s.level);
+  levels.forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; if (l === s.level) o.selected = true; lvlSel.appendChild(o); });
+  g('af_grade').value = s.grade || '';
+  g('af_name').value = s.name || '';
+  g('af_desc').value = s.desc || '';
+  g('af_diff').value = s.diff || 1;
+  g('af_tp').value = s.tp || '';
+  ['fn','pr','rs','rb'].forEach(k => {
+    g('af_' + k + '_l').value = (s[k] && s[k].l) || '';
+    g('af_' + k + '_e').value = (s[k] && s[k].e) || '';
+  });
+}
+function adminSave() {
+  const g = id => document.getElementById(id);
+  const name = g('af_name').value.trim();
+  if (!name) { alert('Please enter a scenario name/code (e.g., AB).'); return; }
+  const obj = {
+    level: g('af_level').value,
+    grade: g('af_grade').value.trim(),
+    name: name,
+    desc: g('af_desc').value.trim(),
+    diff: parseInt(g('af_diff').value, 10) || 1,
+    tp: g('af_tp').value.trim(),
+    fn: { l: g('af_fn_l').value.trim(), e: g('af_fn_e').value.trim() },
+    pr: { l: g('af_pr_l').value.trim(), e: g('af_pr_e').value.trim() },
+    rs: { l: g('af_rs_l').value.trim(), e: g('af_rs_e').value.trim() },
+    rb: { l: g('af_rb_l').value.trim(), e: g('af_rb_e').value.trim() }
+  };
+  if (adminEditIndex >= 0) SCENARIOS[adminEditIndex] = obj; else SCENARIOS.push(obj);
+  saveScenariosToStore(); renderAdminList(); showAdminList(); syncSetupList();
+}
+function adminCancelEdit() { showAdminList(); }
+function adminExport() {
+  const data = JSON.stringify(SCENARIOS, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'scenarios.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function adminImportFile(input) {
+  const file = input.files[0]; if (!file) return;
+  const rdr = new FileReader();
+  rdr.onload = e => {
+    try {
+      const arr = JSON.parse(e.target.result);
+      if (!Array.isArray(arr) || !arr.length) { alert('That file does not contain a scenario list.'); input.value = ''; return; }
+      if (!confirm('Replace all current scenarios with the ' + arr.length + ' from this file?')) { input.value = ''; return; }
+      SCENARIOS.length = 0; arr.forEach(s => SCENARIOS.push(s));
+      saveScenariosToStore(); renderAdminList(); syncSetupList();
+      alert('Imported ' + arr.length + ' scenarios.');
+    } catch (err) { alert('Could not read that file: ' + err.message); }
+    input.value = '';
+  };
+  rdr.readAsText(file);
+}
+function adminReset() {
+  if (!confirm('Reset to the original built-in scenarios? Your local edits will be lost. Export a backup first if unsure.')) return;
+  SCENARIOS.length = 0; JSON.parse(JSON.stringify(SCEN_DEFAULTS)).forEach(s => SCENARIOS.push(s));
+  try { localStorage.removeItem(SCEN_KEY); } catch (e) {}
+  renderAdminList(); syncSetupList();
+}
+/* ══════════════ STAGE 2: PUBLISH TO LIVE (GitHub Contents API) ══════════════ */
+const GH_OWNER = 'hsalaman1';
+const GH_REPO = 'build-the-plan';
+const GH_BRANCH = 'main';
+const GH_PATH = 'scenarios.json';
+const GH_TOKEN_KEY = 'btp_gh_token';
+
+function getGhToken() { try { return localStorage.getItem(GH_TOKEN_KEY) || ''; } catch (e) { return ''; } }
+function setGhToken() {
+  const existing = getGhToken();
+  const msg = existing
+    ? 'A GitHub token is already saved in this browser. Paste a NEW token to replace it, or leave blank and click OK to keep the current one.'
+    : 'Paste your GitHub fine-grained token. It is stored only in this browser (you will not need to paste it again).';
+  const t = prompt(msg, '');
+  if (t === null) return;                       /* Cancel = no change */
+  const v = t.trim();
+  if (!v) {
+    if (existing) {
+      if (confirm('Keep the token already saved?\n\nOK = keep it.   Cancel = disconnect (remove it).')) { updateGhStatus(); return; }
+      try { localStorage.removeItem(GH_TOKEN_KEY); } catch (e) {}
+      updateGhStatus(); alert('Token disconnected.'); return;
+    }
+    updateGhStatus(); return;
+  }
+  try { localStorage.setItem(GH_TOKEN_KEY, v); } catch (e) {}
+  updateGhStatus();
+  alert('Token saved to this browser. It will stay saved — you will not need to paste it again.');
+}
+function updateGhStatus() {
+  const on = !!getGhToken();
+  const el = document.getElementById('ghStatus');
+  if (el) { el.textContent = on ? 'GitHub connected' : 'Not connected'; el.className = 'gh-status ' + (on ? 'gh-on' : 'gh-off'); }
+  const btn = document.getElementById('ghConnectBtn');
+  if (btn) btn.textContent = on ? 'Change token' : 'Connect GitHub';
+}
+/* UTF-8 safe base64 — plain btoa() throws on →, —, · which appear in the scenarios */
+function utf8ToB64(str) { return btoa(unescape(encodeURIComponent(str))); }
+
+async function adminPublish() {
+  const token = getGhToken();
+  if (!token) { alert('No GitHub token set. Click "Connect GitHub" first.'); return; }
+  if (!confirm('Publish ' + SCENARIOS.length + ' scenarios to the live site? This updates what everyone sees online.')) return;
+  const apiBase = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_PATH;
+  const headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+  const btn = document.getElementById('ghPublishBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
+  try {
+    let sha = null;
+    const getRes = await fetch(apiBase + '?ref=' + GH_BRANCH, { headers, cache: 'no-store' });
+    if (getRes.ok) { const j = await getRes.json(); sha = j.sha; }
+    else if (getRes.status === 401) { throw new Error('Token rejected (401). Regenerate it and reconnect.'); }
+    else if (getRes.status === 404) { sha = null; /* first publish — file does not exist yet */ }
+    else { throw new Error('GitHub read failed (' + getRes.status + '). Check the token has Contents: Read and write on ' + GH_REPO + '.'); }
+    const json = JSON.stringify(SCENARIOS, null, 2);
+    const body = { message: 'Update scenarios via admin (' + SCENARIOS.length + ' scenarios)', content: utf8ToB64(json), branch: GH_BRANCH };
+    if (sha) body.sha = sha;
+    const putRes = await fetch(apiBase, { method: 'PUT', headers, body: JSON.stringify(body) });
+    if (!putRes.ok) {
+      const txt = await putRes.text();
+      if (putRes.status === 403) throw new Error('The token cannot write to the repo (403).\n\nFix it on GitHub (edit the same token, no re-paste needed):\n1. Repository access = "Only select repositories" -> build-the-plan (NOT "Public Repositories").\n2. Permissions -> Contents -> Read and write.\nThen click Update token and try Publish again.');
+      throw new Error('GitHub write failed (' + putRes.status + '). ' + txt.slice(0, 200));
+    }
+    alert('Published! The live site updates in about 1 to 2 minutes (Vercel and GitHub Pages rebuild automatically). Hard-refresh (Ctrl+F5) the live page if you do not see it right away.');
+  } catch (e) {
+    alert('Publish failed: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Publish to Live'; }
+  }
+}
+function adminReloadPublished() {
+  fetch('scenarios.json', { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error('No published file found (status ' + r.status + ').'); return r.json(); })
+    .then(arr => {
+      if (!Array.isArray(arr) || !arr.length) throw new Error('Published file has no scenarios.');
+      if (!confirm('Replace your local scenarios with the ' + arr.length + ' currently published online?')) return;
+      SCENARIOS.length = 0; arr.forEach(s => SCENARIOS.push(s));
+      saveScenariosToStore(); renderAdminList(); syncSetupList();
+      alert('Loaded ' + arr.length + ' scenarios from the published file.');
+    })
+    .catch(e => alert('Could not load published scenarios: ' + e.message + '\nThis works on the live site when online, not on the local file.'));
+}
+
+if (location.hash === '#admin') promptAdmin();
 </script>
 </body>
 </html>
