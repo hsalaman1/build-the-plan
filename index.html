@@ -640,6 +640,8 @@ body.big-text .rev-desc { font-size: 0.96rem; }
 .gh-status{ margin-left:auto; font-size:.82rem; font-weight:600; padding:.2rem .6rem; border-radius:20px; }
 .gh-on{ color:#166534; background:#dcfce7; }
 .gh-off{ color:#9a3412; background:#ffedd5; }
+/* preserve paragraph / line breaks typed into scenario text (round, reveal, cards, answer key) */
+.sc-body, .rev-desc, .a-explain, .ak-desc, .ak-ans { white-space: pre-wrap; }
 @media print{ #adminOverlay{ display:none !important; } }
 </style>
 
