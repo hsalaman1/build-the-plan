@@ -4,48 +4,48 @@
     "grade": "Kindergarten",
     "name": "AB",
     "desc": "AB is a kindergarten student with developmental delays impacting his language and social skills. He enjoys action figures and iPad videos. During recess, AB becomes upset when classmates try to play with the class set of action figures — pushing and hitting other students when they approach.",
-    "diff": 1,
-    "tp": "Aggression only when peers reach for the toys → tangible. A personal set removes the competition entirely.",
     "fn": {
-      "l": "Tangible (Action Figures)",
+      "l": "Tangible",
       "e": "Aggression occurs specifically when others attempt to access AB's preferred items. The behavior functions to protect tangible access. Language delays reduce his ability to communicate competing wants verbally, making physical behavior the fastest available response."
     },
     "pr": {
-      "l": "Designated Personal Set + First/Then",
+      "l": "Give the wanted item ahead + First/Then",
       "e": "Provide AB with his own designated set of action figures to eliminate competition over shared toys. Use a visual First/Then board so he knows what comes after recess. Pre-teach turn-taking expectations with a visual schedule before conflict starts."
     },
     "rs": {
-      "l": "Block + Calm Redirect",
+      "l": "Keep everyone safe + Calmly redirect",
       "e": "Physically block aggression safely without escalating. Calmly redirect AB to a separate play space with his designated items. Keep language simple — lengthy verbal reprimands increase arousal. Use the preferred item itself as an immediate redirect tool."
     },
     "rb": {
-      "l": "AAC / Picture Request Card",
+      "l": "Use AAC or a picture to request",
       "e": "Teach AB to use a picture card, AAC device, or gesture meaning \"my turn\" or \"no\" when peers approach. This gives him a functional communication alternative that earns the same outcome as hitting — without the aggression."
-    }
+    },
+    "tp": "Aggression only when peers reach for the toys → tangible. A personal set removes the competition entirely.",
+    "diff": 1
   },
   {
     "level": "Early Childhood",
     "grade": "Pre-K",
     "name": "CD",
     "desc": "CD is a very active Pre-K student in a blended classroom. He frequently asks to go outside and asks when it's time to go home. CD attempts to climb furniture and leave the classroom. Elopement tends to happen early in the day; climbing increases later — suggesting different triggers across the day.",
-    "diff": 2,
-    "tp": "Two behaviors at different times of day may have two functions — elopement (escape) vs. climbing (sensory). One plan won't fit both.",
     "fn": {
-      "l": "Escape + Sensory (Movement)",
+      "l": "Escape + Sensory",
       "e": "The two behaviors happen at different times of day, which points to two different reasons. Early on, leaving the room lets CD escape a setting that feels non-preferred or overwhelming. Later, climbing gives him the movement and sensory input he needs as his energy builds. His requests to go outside or go home show he is trying to tell staff what he wants."
     },
     "pr": {
-      "l": "Visual Schedule + Movement Breaks",
+      "l": "Visual schedule + Give breaks ahead of time",
       "e": "Post a visual daily schedule that clearly marks outdoor time so CD can see it is coming. Build in movement breaks before the times he usually leaves the room or climbs. Give him activities that let him get his energy out in a functional way, such as movement tasks, active classroom jobs, or a set indoor movement spot, so the need is met before it turns into climbing or leaving."
     },
     "rs": {
-      "l": "Safe Redirect to Alternative Movement",
-      "e": "When climbing happens, stay calm and redirect CD to a safe way to move, such as a sensory spot, an indoor jump space, or a supervised hallway walk. Only use restraint if safety requires it. If he leaves the room, follow and catch up with him calmly instead of chasing.\n\n*Prior to introducing the replacement behaviors or access to the alternative activities we should makd sure that CD is regulated and we add some time between the behavior and the delivery of the alternative activity to not create a behavior chain."
+      "l": "Calmly redirect + Give safe space",
+      "e": "When climbing happens, stay calm and redirect CD to a safe way to move, such as a sensory spot, an indoor jump space, or a supervised hallway walk. Only use restraint if safety requires it. If he leaves the room, follow and catch up with him calmly instead of chasing."
     },
     "rb": {
-      "l": "\"I Need a Break\" Communication",
+      "l": "Ask for a break",
       "e": "Teach CD to hand over a break card or use a gesture to ask for a movement break instead of leaving on his own. Honor the request every time. If he asks and nothing happens, the card will not replace leaving."
-    }
+    },
+    "tp": "Two behaviors at different times of day may have two functions — elopement (escape) vs. climbing (sensory). One plan won't fit both.",
+    "diff": 2
   },
   {
     "level": "Early Childhood",
@@ -53,19 +53,19 @@
     "name": "EF",
     "desc": "EF is a kindergarten student who frequently has tantrums when redirected to sit at the table and complete assigned activities. Tantrums include crying, loud vocalizations, dropping to the floor, and kicking — and can escalate to self-injurious behaviors such as head-banging on furniture or the floor.",
     "fn": {
-      "l": "Escape / Avoidance",
+      "l": "Escape",
       "e": "Tantrums occur in direct response to a demand. The behavior results in removal from or delay of the demand. Escalation to SIB may have been accidentally reinforced when staff withdrew demands to prevent injury — teaching EF that more intense behavior earns faster escape."
     },
     "pr": {
-      "l": "Reduce Demand + First/Then Visual",
+      "l": "Shorten the task + First/Then",
       "e": "Shorten the task duration significantly, offer choices within the activity, and use a First/Then board. Pre-teach transitions with a visual timer so EF knows the demand is temporary and predictable. Gradual approximations are more effective than holding the full demand."
     },
     "rs": {
-      "l": "Neutral Presence + Safety Protocol",
+      "l": "Stay calm, short words + Keep everyone safe",
       "e": "Stay calm and nearby without escalating demands during the tantrum. Do not withdraw the demand entirely (this reinforces behavior) but do not push harder either. If SIB is a safety risk, implement your safety protocol — block without restraint where possible and wait for a window of calm."
     },
     "rb": {
-      "l": "\"I Need Help\" / \"I Need a Break\" Card",
+      "l": "Ask for help + Ask for a break",
       "e": "Teach EF to hand over a break card or use a simple gesture before escalating. Must be taught during calm moments, reinforced immediately every time it is used, and consistently paired with actually receiving a brief break."
     },
     "tp": "The SIB escalated because withdrawing the demand at peak intensity reinforced it. Reduce the demand early, before the escalation.",
@@ -77,19 +77,19 @@
     "name": "GH",
     "desc": "GH is a nonverbal second grader in a separate classroom. He enjoys building with blocks, magnet tiles, and watching videos on the iPad or Smartboard. When given paper and pencil tasks, GH attempts to leave the area. Aggression toward staff has occurred and has resulted in bruises and abrasions.",
     "fn": {
-      "l": "Escape (Aversive Demand)",
+      "l": "Escape",
       "e": "Paper and pencil tasks are highly aversive — likely due to motor difficulty, inability to communicate distress verbally, or a history of failure. Both elopement and aggression result in removal from the demand, which reinforces the behavior. The pattern is predictable by task type."
     },
     "pr": {
-      "l": "Alternative Tools + Pair Demand with Preferred",
+      "l": "Change the setup + Bring the preferred into the work",
       "e": "Present tasks using preferred formats — tablet, keyboard, or magnetic writing board instead of paper and pencil. Intersperse short preferred activities between demand intervals. Use a First/Then structure and reduce response effort before introducing new expectations."
     },
     "rs": {
-      "l": "Safety Protocol + Reduce Demand In-the-Moment",
+      "l": "Keep everyone safe + Reduce or drop the demand",
       "e": "When agitation begins, reduce or pause the demand before behavior escalates. Stay calm, use simple language or visuals. If aggression occurs, follow your school's safety protocol: protect yourself and others while maintaining a regulated, non-reactive presence."
     },
     "rb": {
-      "l": "AAC \"Help\" / \"Break\" Request",
+      "l": "Use AAC to request + Ask for a break",
       "e": "Teach GH to use an AAC device, picture card, or gesture to request a break or assistance. Must be reinforced consistently and immediately. Over time, pair appropriate requesting with preferred activities so functional communication becomes more effective than aggression."
     },
     "tp": "Escape is predictable by task type (paper/pencil). Change the format before trying to manage the aggression.",
@@ -101,19 +101,19 @@
     "name": "IJ",
     "desc": "IJ is a first grader in a regular education classroom who requires frequent redirection and struggles to stay seated in large groups for more than 3 minutes. IJ frequently leaves the group and walks to the cubby area where students keep their lunch bags — and has removed and eaten classmates' food.",
     "fn": {
-      "l": "Tangible (Food Access)",
+      "l": "Tangible",
       "e": "IJ's wandering has a clear destination and consistent outcome: eating food from lunch bags. The behavior is maintained by tangible access to food. Escape from the group may play a secondary role, but the consistent location and outcome point to food as the primary function."
     },
     "pr": {
-      "l": "Environmental Modification + Structured Seating",
+      "l": "Change the setup + Give the wanted item ahead",
       "e": "Relocate or remove visibility of lunch bags during group instruction time. Seat IJ near the teacher and away from the cubby area. Provide visual cues for expected behavior and a visual timer to define how long the activity lasts."
     },
     "rs": {
-      "l": "Calm Redirect Without Power Struggle",
+      "l": "Calmly redirect + Stay calm, short words",
       "e": "When IJ gets up, calmly redirect back to the group using a simple verbal prompt or visual cue — not a lecture or public correction. If food was already accessed, address calmly after the situation settles. Avoid confrontation that escalates behavior."
     },
     "rb": {
-      "l": "Scheduled Snack + Request Communication",
+      "l": "Ask for the item the right way",
       "e": "Ensure a predictable scheduled snack time. Teach IJ to ask for a snack using words, a card, or a gesture at the appropriate time. When a legitimate snack time is available and honored consistently, the motivation to wander to the cubbies decreases."
     },
     "tp": "Same destination, same outcome every time → tangible (food). Remove access and schedule a real snack.",
@@ -125,19 +125,19 @@
     "name": "KL",
     "desc": "KL is a second grader whose favorite subject is math — he will engage with math facts and games for extended periods. When given non-preferred tasks, KL engages in verbal protests that may include profanity. When ignored, behaviors escalate to flipping furniture and throwing objects at others.",
     "fn": {
-      "l": "Escape (Non-Preferred Task)",
+      "l": "Escape",
       "e": "Verbal protests and property destruction occur in response to non-preferred task demands. Escalation suggests lower-level protests have been reinforced by demand removal in the past. The function is escape from work KL finds aversive."
     },
     "pr": {
-      "l": "First/Then + Embed Preferred Within Work",
+      "l": "First/Then + Bring the preferred into the work",
       "e": "Make the contingency explicit before the task: \"First this, then math.\" Reduce the non-preferred task length significantly and offer choices within it. Pre-plan the sequence so KL can see the end before protests start."
     },
     "rs": {
-      "l": "WAIT + Safety Protocol for Escalation",
+      "l": "WAIT (stop talking) + Keep everyone safe",
       "e": "When protests begin, stop talking — WAIT (Why Am I Talking?). The lecture often becomes the reinforcer. If behavior escalates to property destruction, implement safety protocols: remove other students, stay calm, do not escalate demands. Wait for a window of calm."
     },
     "rb": {
-      "l": "Raise Hand / Break Card",
+      "l": "Raise a hand + Ask for a break",
       "e": "Teach KL to raise his hand or hand in a break card before escalating. Must be honored predictably and immediately — if he asks and demands continue without acknowledgment, the card loses all function."
     },
     "tp": "Escalation to property destruction means low-level protests were reinforced by escape before. WAIT — the lecture is fuel.",
@@ -149,19 +149,19 @@
     "name": "MN",
     "desc": "MN is a fourth grade student in a separate classroom setting. MN frequently refuses to enter the classroom during morning arrival — as MN gets close to the door, MN drops to the floor and refuses to move. MN always carries a favorite stuffed animal in the bookbag. A preferred class activity is center time, where MN goes to the listening station to listen to books while reading along.",
     "fn": {
-      "l": "Escape / Avoidance (Entering the Classroom)",
+      "l": "Escape",
       "e": "The behavior happens at one specific moment — the doorway at arrival — and it works: MN stays out of the room. Something about entering is aversive, whether it is the noise, the transition, or the unpredictability of what comes first. Dropping to the floor delays or prevents entry, and that delay is the reinforcer."
     },
     "pr": {
-      "l": "First/Then Using Center Time + Bring the Stuffed Animal In",
+      "l": "First/Then + Give the wanted item ahead",
       "e": "Use what MN already loves. Make the contingency visible at the door: \"First we walk in, then listening station.\" Let the stuffed animal come in as a transition object — a comfort item that travels with MN into the room lowers the aversiveness of entering. Consider a job at arrival (deliver attendance, turn on the listening station) so entering has an immediate purpose and payoff."
     },
     "rs": {
-      "l": "Do Not Escalate at the Door — Reduce, Do Not Push",
+      "l": "Reduce or drop the demand + Give safe space",
       "e": "Physically pulling or looming over a student on the floor turns refusal into a crisis. Get low, keep language minimal, and reduce the demand instead of repeating it: \"You can walk in, or I can walk in with you.\" Give processing time. Reinforce the smallest approximation — a step, standing up, moving toward the door — rather than holding out for full compliance."
     },
     "rb": {
-      "l": "Teach a Transition Request",
+      "l": "Ask for a break or more time",
       "e": "Teach MN to ask for what is actually being requested through refusal — more time, the stuffed animal, or a preferred first activity. A card or verbal phrase (\"I need a minute\" / \"Can I start at the listening station?\") that is honored reliably gives MN a way to influence the transition without dropping to the floor."
     },
     "tp": "Escape at one specific moment — the doorway. Use the loved center + comfort object to make entering less aversive.",
@@ -173,19 +173,19 @@
     "name": "OP",
     "desc": "OP is a fifth grade student in a regular education classroom. OP's favorite subject is science and frequently asks to read books about animals and dinosaurs. When given a non-preferred task, OP frequently attempts to elope from the classroom. Blocking the attempts to leave the room has resulted in aggression.",
     "fn": {
-      "l": "Escape (Non-Preferred Task)",
+      "l": "Escape",
       "e": "Elopement is triggered by the non-preferred task and results in leaving the demand behind. The aggression is not a separate problem — it appears only when the escape route is blocked. That is an important read: blocking without teaching an alternative escalates the topography but does not change the function."
     },
     "pr": {
-      "l": "First/Then With Science + Reduce Response Effort",
+      "l": "First/Then + Shorten the task",
       "e": "Use science as the \"then.\" Make the contingency explicit and short before the non-preferred task begins, and shrink the task so the finish line is visible. Embed OP's interests into the non-preferred work where possible — a writing prompt about dinosaurs is still writing. Offer choice within the task to increase buy-in before elopement is on the table."
     },
     "rs": {
-      "l": "Safe Supervision, Not a Blockade + Safety Protocol",
+      "l": "Give safe space + Keep everyone safe",
       "e": "Blocking the door reliably produces aggression, so plan around it: define a safe, supervised area OP can go to, keep a calm distance, and follow the student rather than confronting. Do not chase or corner. If aggression occurs, follow your school safety protocol and stay non-reactive. Once calm, return to a reduced version of the demand so escape is not fully reinforced."
     },
     "rb": {
-      "l": "Break Card (FCT) — An Escape Route That Is Allowed",
+      "l": "Ask for a break",
       "e": "OP needs a legitimate way to leave. Teach a break card or a \"walk pass\" that produces the same outcome as eloping — brief removal from the demand — but safely and with permission. It must be honored immediately and every time. If asking is slower or less reliable than running, running will keep winning."
     },
     "tp": "Aggression appears only when the exit is blocked — same escape function, worse topography. Teach a break/pass instead of blocking.",
@@ -197,19 +197,19 @@
     "name": "QR",
     "desc": "QR is a nonverbal fifth grade student in a separate classroom setting. QR's favorite activities are watching videos on the iPad and playing video games. When unexpected interruptions to the day occur — a fire drill, an emergency drill, a crisis with another student — QR becomes upset, which has escalated to self-injurious behavior including head banging.",
     "fn": {
-      "l": "Escape From Unexpected Change",
+      "l": "Escape",
       "e": "The trigger is not the task. It is losing the schedule QR was expecting. When the day changes with no warning, such as a fire drill, an emergency drill, or a crisis with another student, QR loses access to the routine he was counting on. That unexpected change is the aversive event, and the self-injury works because it escapes or ends the change. Because QR is nonverbal, he cannot ask what is happening or ask for it to stop, so the behavior does the asking for him."
     },
     "pr": {
-      "l": "Pair Unexpected Changes With a Reinforcer",
+      "l": "Give the wanted item ahead + Give a heads-up before changes",
       "e": "Have a preferred item ready before the change starts, not after QR is already upset. Whenever an unexpected event is about to happen, or the moment it begins, deliver a reinforcer such as the iPad or headphones right away. The goal is for a reinforcer to be available every single time an unexpected change occurs, so the change is paired with something QR values. Delivering it early lowers the chance the behavior builds into self-injury."
     },
     "rs": {
-      "l": "Keep QR Safe, and Do Not Reward the Self-Injury",
+      "l": "Keep everyone safe + Don't give the payoff",
       "e": "Self-injury is a safety event, so follow your protocol first: protect the head, block safely without restraint, remove hazards, and keep talking to a minimum. The rule that makes the plan work is timing. Do not give QR the reinforcer right after the head banging. If the iPad shows up every time the self-injury starts, the self-injury is what gets reinforced. Deliver preferred items early, before the behavior, or once QR is calm, never as the payoff at the peak."
     },
     "rb": {
-      "l": "Teach a Visual Way to Say the Event Is Too Much",
+      "l": "Say \"too much\" or \"stop\"",
       "e": "Give QR a visual he can use to show that the event is aversive, such as a picture card, an AAC symbol, or a gesture that means \"too much\" or \"break.\" Prompt him with the visual as soon as a change begins. Teach this only during calm periods, never in the middle of an escalation, and reinforce it immediately every single time he uses it before the self-injury happens. It has to work faster and more reliably than the head banging, or it will not replace it."
     },
     "tp": "Function is escape from an unexpected change, not a task. Pair each change with a reinforcer delivered early, never after the SIB, and teach a visual QR can use to say the event is too much.",
@@ -221,19 +221,19 @@
     "name": "ST",
     "desc": "ST is a ninth grade student in a separate classroom setting. Preferred activities include watching videos on YouTube and listening to music. ST has limited communication skills and frequently refuses to engage with classroom activities. When prompted to participate, ST attempts to leave the area. Aggression toward staff has occurred when staff attempt to redirect ST back to the appropriate activity.",
     "fn": {
-      "l": "Escape (Demand + Redirection)",
+      "l": "Escape",
       "e": "Two escape events are stacked. The prompt to participate triggers leaving the area, and the redirection back triggers aggression. Both behaviors terminate a demand. Limited communication means ST has no efficient way to say \"no,\" \"not yet,\" or \"I need help\" — so leaving and hitting do that job, and they do it fast."
     },
     "pr": {
-      "l": "Pair Preferred Media With the Demand + First/Then",
+      "l": "Bring the preferred into the work + First/Then",
       "e": "Use YouTube and music as the \"then,\" and make it visual — ST's communication limits mean a verbal contingency may not land. Shorten the work interval dramatically and build in music or video breaks on a schedule (NCR) so ST does not have to escape to get them. Reduce response effort before adding expectations."
     },
     "rs": {
-      "l": "Do Not Chase the Redirection — Follow the Safety Protocol",
+      "l": "Give safe space + Keep everyone safe",
       "e": "Redirecting ST back is the specific trigger for aggression, so stop making that the automatic first move. Allow safe distance in a supervised area, drop the demand temporarily, and stay calm and non-reactive. If aggression occurs, follow your school safety protocol. Re-approach later with a reduced demand rather than escalating in the moment."
     },
     "rb": {
-      "l": "Prompt a Break Request, Then Reward Coming Back",
+      "l": "Ask for a break",
       "e": "Give ST a low-effort way to ask for a break instead of leaving or hitting, such as a break card, an AAC symbol, or a gesture that means \"break\" or \"all done.\" Prompt him to use it the moment you see him start to pull away, before he leaves the area, and honor it right away every time. The key step is what comes next: when ST returns to the task after his break, reinforce that return immediately with praise and a preferred item such as YouTube or music. Rewarding the return teaches him that asking and coming back works better than escaping, and over time you can slowly increase how much work he does before each break."
     },
     "tp": "Two stacked escape events — the prompt triggers leaving, the redirection triggers aggression. Stop making redirection the first move.",
@@ -245,19 +245,19 @@
     "name": "UV",
     "desc": "UV is a tenth grade student in the regular education setting. UV's preferred classes are music and digital design. When UV attends a non-preferred class, UV frequently refuses to participate in the assigned activity and engages in behavior that is disruptive to the rest of the class — calling out, talking to peers, or using the computer in a way that distracts other students.",
     "fn": {
-      "l": "Escape (Non-Preferred Class) + Peer Attention",
+      "l": "Escape + Attention",
       "e": "Two things are running at once. The refusal is escape — it only happens in non-preferred classes, never in music or digital design. But the calling out and peer-directed disruption also earn an audience, which is why the behavior is loud rather than silent. A student purely escaping work can just put their head down. Disruption gets both."
     },
     "pr": {
-      "l": "First/Then + Embed Preferred Skills Into Non-Preferred Work",
+      "l": "First/Then + Bring the preferred into the work",
       "e": "Make the contingency explicit and adult: \"Finish this block, then you have the last ten minutes for digital design.\" Bring the preferred content into the non-preferred class where you can — let UV present a project digitally, build a slide deck, use design software for the assignment. Reduce the task so completion is realistic, and offer choice within it."
     },
     "rs": {
-      "l": "Private Precision Request + WAIT + Remove the Audience",
+      "l": "WAIT (stop talking) + Don't give the payoff",
       "e": "A public correction hands UV the peer attention half of the reinforcer. Deliver one clear, calm, private request — then stop talking (WAIT). Do not debate. Redirect the peers who are reacting, since they are delivering the reinforcer. Reinforce the moment UV re-engages, even partially, rather than waiting for a perfect finished product."
     },
     "rb": {
-      "l": "Break Card + Self-Monitoring Checklist",
+      "l": "Ask for a break + Get peer attention the right way",
       "e": "UV needs both routes covered: a legitimate way to get a break from the non-preferred class, and a legitimate way to earn recognition. A self-monitoring checklist gives UV agency and a visible path to the preferred activity; an appropriate participation signal (hand raised, contributing to discussion) earns the peer attention that calling out currently supplies."
     },
     "tp": "Refusal is escape (non-preferred classes only); the loud disruption adds a peer audience. Correct privately to remove half the payoff.",
@@ -269,19 +269,19 @@
     "name": "WX",
     "desc": "WX is an eleventh grade student in a separate classroom setting. WX typically follows directions and frequently offers to help staff with tasks in the classroom and around campus. When WX experiences a disappointment or is unable to have something he requested, intense perseveration and property destruction — pushing materials away, tearing items from the wall — may occur, and can escalate to aggression.",
     "fn": {
-      "l": "Tangible / Access (Denied Request)",
+      "l": "Tangible",
       "e": "WX is cooperative and helpful the rest of the time, so this is not escape from demands — he willingly takes on tasks. The behavior is triggered specifically by disappointment or being told \"no,\" and the perseveration keeps the denied item or activity front and center. The function is regaining access to what was requested, or protesting its loss."
     },
     "pr": {
-      "l": "Prime for \"No\" + First/Then + Pre-Taught Coping Routine",
+      "l": "Give a heads-up before changes + First/Then",
       "e": "Prepare WX for likely denials before they happen. Give advance notice, and turn \"no\" into \"not yet\" with a First/Then or a clear when/then so the request has a future path. Teach a coping routine (a break, deep breathing, a helper task) during calm times so it is available under stress. Keep his helper roles frequent so reinforcement is not tied only to getting every request granted."
     },
     "rs": {
-      "l": "Acknowledge Briefly, Redirect to Coping — Do Not Argue",
+      "l": "Stay calm, short words + Don't give the payoff",
       "e": "Do not over-explain or debate the denial in the moment; that feeds the perseveration. Briefly acknowledge the feeling, prompt the coping routine or a redirection to a preferred helper task, and give processing space. If property destruction or aggression occurs, follow your safety protocol — clear the area, protect people, stay calm and non-reactive. Re-engage once calm."
     },
     "rb": {
-      "l": "Teach \"Ask Again Later\" + Accepting No",
+      "l": "Ask for the item the right way",
       "e": "Give WX a functional way to handle denial: a phrase or card to request the item at an agreed later time, paired with a taught coping response that earns attention and a sense of control. Reinforce accepting \"no\" and using the coping routine heavily during calm practice, so those responses can compete with perseveration and destruction."
     },
     "tp": "Cooperative student — the trigger is denial/disappointment, not task demands. Function is access to the denied request; teach \"accepting no\" + a coping routine and don't argue the \"no\" in the moment.",
