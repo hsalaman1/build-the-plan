@@ -1165,9 +1165,9 @@ function updateRoundHint() {
   const hint = document.getElementById('roundHint');
   if (sel === 0) { hint.textContent = 'Select at least one scenario to play.'; return; }
   if (roundLimit > 0 && roundLimit < sel) {
-    hint.textContent = `${sel} scenarios selected — ${roundLimit} will be picked at random each game.`;
+    hint.textContent = `${sel} scenarios selected — ${roundLimit} will be picked and played in a random order each game.`;
   } else {
-    hint.textContent = `${sel} scenario${sel===1?'':'s'} selected — all will be played.`;
+    hint.textContent = `${sel} scenario${sel===1?'':'s'} selected — all will be played${sel > 1 ? ' in a random order' : ''}.`;
   }
 }
 
@@ -1177,15 +1177,13 @@ function startGame() {
   const pool = SCENARIOS.filter((_,i) => document.getElementById('scen-'+i)?.checked);
   if (pool.length === 0) { alert('Select at least one scenario to play.'); return; }
 
-  if (roundLimit > 0 && roundLimit < pool.length) {
-    const idx = pool.map(s => SCENARIOS.indexOf(s));
-    for (let k = idx.length-1; k > 0; k--) {
+  deck = [...pool];
+  for (let k = deck.length-1; k > 0; k--) {
       const j = Math.floor(Math.random() * (k+1));
-      [idx[k], idx[j]] = [idx[j], idx[k]];
-    }
-    deck = idx.slice(0, roundLimit).sort((a,b) => a-b).map(i => SCENARIOS[i]);
-  } else {
-    deck = pool;
+      [deck[k], deck[j]] = [deck[j], deck[k]];
+  }
+  if (roundLimit > 0 && roundLimit < deck.length) {
+    deck = deck.slice(0, roundLimit);
   }
 
   teams = []; scores = []; scoreSnapshots = [];
